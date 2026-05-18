@@ -28,61 +28,54 @@ export default function InterviewCard({
   const coverImage = getStableCover(interviewId);
 
   return (
-    <div className="card-border w-[360px] max-sm:w-full min-h-96">
-      <div className="card-interview">
-        <div>
-          {/* Type Badge */}
-          <div
-            className={cn(
-              "absolute top-0 right-0 w-fit px-4 py-2 rounded-bl-lg",
+    <div className="card-border w-full group h-full">
+      <div className="card p-6 border border-white/5 hover:border-primary-200/30 transition-all flex flex-col h-full min-h-[340px]">
+        <div className="flex justify-between items-start mb-6">
+          <div className="size-14 rounded-2xl bg-white/5 flex-center overflow-hidden border border-white/5 shadow-inner">
+            <Image
+              src={coverImage}
+              alt="cover"
+              width={120}
+              height={120}
+              className="size-full object-cover transition-transform group-hover:scale-105"
+            />
+          </div>
+          <div className="flex flex-col items-end gap-1.5">
+            <span className={cn(
+              "px-3 py-1 rounded-full text-[10px] font-bold text-white shadow-sm",
               badgeColor[normalizedType] || "bg-light-600"
-            )}
-          >
-            <p className="badge-text">{normalizedType}</p>
-          </div>
-
-          {/* Cover */}
-          <Image
-            src={coverImage}
-            alt="cover"
-            width={90}
-            height={90}
-            className="rounded-full object-cover size-[90px]"
-          />
-
-          <h3 className="mt-5 capitalize">{job.role} Interview</h3>
-
-          {/* Date & Score */}
-          <div className="flex flex-row gap-5 mt-3">
-            <div className="flex flex-row gap-2">
-              <Image src="/calendar.svg" width={22} height={22} alt="calendar" />
-              <p>{formattedDate}</p>
-            </div>
-            <div className="flex flex-row gap-2 items-center">
-              <Image src="/star.svg" width={22} height={22} alt="star" />
-              <p>{feedback?.totalScore || "---"}/100</p>
+            )}>
+              {normalizedType}
+            </span>
+            <div className="flex items-center gap-1.5 px-2 py-1 bg-dark-200 rounded-lg border border-white/5">
+              <Image src="/star.svg" width={14} height={14} alt="star" className="opacity-80" />
+              <p className="text-[11px] font-bold text-white">{feedback?.totalScore || "---"}</p>
             </div>
           </div>
+        </div>
 
-          <p className="line-clamp-2 mt-5">
+        <div className="flex-1">
+          <h3 className="text-xl font-bold text-white mb-1 leading-tight">{job.role} Interview</h3>
+          <div className="flex items-center gap-2 mb-4 text-xs text-light-400">
+            <Image src="/calendar.svg" width={14} height={14} alt="calendar" className="opacity-60" />
+            <span>{formattedDate}</span>
+          </div>
+          <p className="text-sm text-light-100/70 line-clamp-3 leading-relaxed mb-6">
             {feedback?.finalAssessment ||
-              "You haven't taken this interview yet. Take it now to improve your skills."}
+              "You haven't taken this interview yet. Complete it now to get personalized AI feedback."}
           </p>
         </div>
 
-        <div className="flex flex-row justify-between items-center">
+        <div className="flex items-center justify-between mt-auto pt-6 border-t border-white/5">
           {/* Tech icons stack */}
-          <div className="flex flex-row mr-2">
-            {techIcons.slice(0, 4).map(({ tech, url }, idx) => (
+          <div className="flex flex-row -space-x-2">
+            {techIcons.slice(0, 4).map(({ tech, url }) => (
               <div
                 key={tech}
-                className={cn(
-                  "relative group bg-white/10 rounded-full p-2 flex-center border border-white/5",
-                  idx >= 1 && "-ml-3"
-                )}
+                className="relative group size-10 rounded-full bg-dark-200 border-2 border-background flex-center hover:z-10 transition-transform hover:-translate-y-0.5"
               >
                 <span className="tech-tooltip">{tech}</span>
-                <Image src={url} alt={tech} width={100} height={100} className="size-6" />
+                <Image src={url} alt={tech} width={100} height={100} className="size-5 opacity-80 group-hover:opacity-100" />
               </div>
             ))}
           </div>
@@ -93,9 +86,9 @@ export default function InterviewCard({
                 ? `/dashboard/interviews/feedback/${interviewId}`
                 : `/dashboard/interviews/session/${interviewId}`
             }
-            className="btn-primary text-xs px-5 py-2 min-h-0"
+            className="btn-secondary text-xs px-5 py-2 min-h-0 flex items-center gap-2"
           >
-            {feedback ? "Check Feedback" : "Start"}
+            {feedback ? "Feedback" : "Start"} <span className="opacity-50 text-[10px]">&rarr;</span>
           </Link>
         </div>
       </div>

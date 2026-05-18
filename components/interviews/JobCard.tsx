@@ -19,61 +19,61 @@ export default function JobCard({ job, interviewCount = 0 }: JobCardProps) {
   };
 
   return (
-    <div className="card-border w-[360px] max-sm:w-full">
-      <div className="card-interview">
-        <div>
-          <div
-            className={cn(
-              "absolute top-0 right-0 w-fit px-4 py-2 rounded-bl-lg",
-              badgeColor[job.type] || "bg-light-600"
-            )}
-          >
-            <p className="badge-text">{job.type}</p>
-          </div>
-
-          <div className="flex items-center gap-4">
+    <div className="card-border w-full group">
+      <div className="card p-6 border border-white/5 hover:border-primary-200/30 transition-all flex flex-col h-full min-h-[220px]">
+        <div className="flex justify-between items-start mb-6">
+          <div className="size-12 rounded-xl bg-white/5 p-2 flex-center overflow-hidden border border-white/5">
             <Image
               src={coverImage}
               alt={job.company}
-              width={60}
-              height={60}
-              className="rounded-full object-cover size-[60px]"
+              width={100}
+              height={100}
+              className="size-full object-contain"
             />
-            <div>
-              <h3 className="text-xl capitalize">{job.role}</h3>
-              <p className="text-light-400 text-sm">{job.company} · {job.level}</p>
-            </div>
           </div>
-
-          <p className="line-clamp-2 mt-4 text-sm">{job.description}</p>
-
-          {interviewCount > 0 && (
-            <p className="text-xs text-primary-200 mt-3">
-              {interviewCount} interview{interviewCount > 1 ? "s" : ""} taken
-            </p>
-          )}
+          <div className="flex gap-1.5 flex-wrap justify-end">
+            <span className={cn(
+              "px-2 py-0.5 rounded-full text-[10px] font-bold",
+              badgeColor[job.type] || "bg-light-600",
+              "text-white shadow-sm"
+            )}>
+              {job.type}
+            </span>
+            {interviewCount > 0 && (
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-primary-200/20 text-primary-200">
+                {interviewCount} {interviewCount > 1 ? "Interviews" : "Interview"}
+              </span>
+            )}
+          </div>
         </div>
 
-        <div className="flex flex-row justify-between items-end">
-          <div className="flex flex-row items-center gap-1">
-            <div className="flex flex-row mr-2">
-              {techIcons.slice(0, 4).map(({ tech, url }, idx) => (
-                <div
-                  key={tech}
-                  className={cn(
-                    "relative group bg-white/10 rounded-full p-2 flex-center border border-white/5",
-                    idx >= 1 && "-ml-3"
-                  )}
-                >
-                  <span className="tech-tooltip">{tech}</span>
-                  <Image src={url} alt={tech} width={100} height={100} className="size-6" />
-                </div>
-              ))}
-            </div>
+        <div className="flex-1">
+          <h3 className="text-xl font-bold text-white mb-1 group-hover:text-primary-100 transition-colors">
+            {job.role}
+          </h3>
+          <p className="text-sm text-primary-200 mb-4 font-medium opacity-90">
+            {job.company} <span className="text-light-400 mx-1">·</span> {job.level}
+          </p>
+          <p className="text-sm text-light-100/70 line-clamp-2 leading-relaxed mb-6">
+            {job.description}
+          </p>
+        </div>
+
+        <div className="flex items-center justify-between mt-auto pt-5 border-t border-white/5">
+          <div className="flex flex-row -space-x-2">
+            {techIcons.slice(0, 4).map(({ tech, url }) => (
+              <div
+                key={tech}
+                className="relative group size-10 rounded-full bg-dark-200 border-2 border-background flex-center hover:z-10 transition-transform hover:-translate-y-0.5"
+              >
+                <span className="tech-tooltip">{tech}</span>
+                <Image src={url} alt={tech} width={100} height={100} className="size-5 opacity-80 group-hover:opacity-100" />
+              </div>
+            ))}
           </div>
 
-          <Link href={`/dashboard/jobs/${job.id}`} className="btn-primary text-xs px-5 py-2 min-h-0">
-            View Role
+          <Link href={`/dashboard/jobs/${job.id}`} className="btn-secondary text-xs px-5 py-2 min-h-0 flex items-center gap-2">
+            View Role <span className="opacity-50 text-[10px]">&rarr;</span>
           </Link>
         </div>
       </div>

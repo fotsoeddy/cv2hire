@@ -11,7 +11,7 @@ export default function JobsPage() {
         </p>
       </div>
 
-      <div className="interviews-section">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
         {mockJobs.map((job) => {
           const interviewCount = mockInterviews.filter(
             (i) => i.jobId === job.id
