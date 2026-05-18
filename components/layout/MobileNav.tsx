@@ -12,6 +12,7 @@ import {
   X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 import { useState, useEffect } from "react";
 
 const iconMap: Record<string, React.ElementType> = {
@@ -65,9 +66,13 @@ export default function MobileNav() {
         }}
       >
         <Link href="/dashboard" className="flex items-center gap-2">
-          <div className="size-8 rounded-lg primary-gradient flex-center">
-            <span className="text-white font-bold text-xs">C2</span>
-          </div>
+          <Image
+            src="/logo.png"
+            alt="CV2Hire Logo"
+            width={32}
+            height={32}
+            className="object-contain"
+          />
           <span className="text-lg font-bold text-primary-100">CV2Hire</span>
         </Link>
         <button
@@ -141,9 +146,13 @@ export default function MobileNav() {
       >
         {/* Logo */}
         <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "2.5rem" }}>
-          <div className="size-9 rounded-lg primary-gradient flex-center">
-            <span className="text-white font-bold text-sm">C2</span>
-          </div>
+          <Image
+            src="/logo.png"
+            alt="CV2Hire Logo"
+            width={36}
+            height={36}
+            className="object-contain"
+          />
           <span className="text-xl font-bold text-primary-100">CV2Hire</span>
         </div>
 

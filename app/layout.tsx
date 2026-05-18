@@ -8,9 +8,12 @@ const monaSans = Mona_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "CV2Hire — AI-Powered Job Readiness Platform",
-  description:
-    "Analyze your CV, practice mock interviews, and land your dream job with AI-powered feedback.",
+  title: "CV2Hire - SaaS Platform for CV Analysis & Mock Interviews",
+  description: "Boost your job readiness with AI-powered CV analysis and mock interviewer sessions.",
+  icons: {
+    icon: "/logo.png",
+    apple: "/logo.png",
+  },
 };
 
 export default function RootLayout({
