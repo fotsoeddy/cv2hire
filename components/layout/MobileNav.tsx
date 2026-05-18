@@ -11,6 +11,7 @@ import {
   Menu,
   X,
   LogOut,
+  Zap,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState, useEffect } from "react";
