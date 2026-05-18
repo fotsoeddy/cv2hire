@@ -105,17 +105,24 @@ export default function Sidebar() {
         )}
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className="sidebar-link justify-center"
+          className="sidebar-link justify-center mb-1"
         >
           {collapsed ? (
             <ChevronRight className="size-5" />
           ) : (
             <>
               <ChevronLeft className="size-5" />
-              <span>Collapse</span>
+              <span>Collapse Sidebar</span>
             </>
           )}
         </button>
+        <Link
+          href="/auth/sign-in"
+          className="sidebar-link text-destructive-100 hover:bg-destructive-100/10"
+        >
+          <LogOut className="size-5 flex-shrink-0" />
+          {!collapsed && <span>Sign Out</span>}
+        </Link>
       </div>
     </aside>
   );

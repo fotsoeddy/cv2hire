@@ -10,10 +10,12 @@ import {
   Settings,
   Menu,
   X,
+  LogOut,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import Image from "next/image";
 import { useState, useEffect } from "react";
+import Image from "next/image";
+import { mockUser } from "@/constants/mock-data";
 
 const iconMap: Record<string, React.ElementType> = {
   LayoutDashboard,
@@ -75,38 +77,44 @@ export default function MobileNav() {
             priority
           />
         </Link>
-        <button
-          onClick={() => {
-            console.log("Burger clicked", !open);
-            setOpen(!open);
-          }}
-          type="button"
-          aria-label="Toggle menu"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            width: "48px",
-            height: "48px",
-            color: "white",
-            background: open ? "rgba(255,255,255,0.1)" : "transparent",
-            border: "none",
-            borderRadius: "0.75rem",
-            cursor: "pointer",
-            zIndex: 101,
-            position: "relative",
-          }}
-        >
-          {open ? (
-            <X className="size-8" />
-          ) : (
-            <div className="flex flex-col gap-1.5 items-end">
-              <div className="w-8 h-1 bg-white rounded-full" />
-              <div className="w-6 h-1 bg-white rounded-full" />
-              <div className="w-8 h-1 bg-white rounded-full" />
-            </div>
-          )}
-        </button>
+        <div className="flex items-center gap-3">
+          <div className="hidden sm:flex items-center gap-1.5 px-2 py-1 rounded-full bg-primary-200/10 border border-primary-200/20">
+            <CreditCard className="size-3.5 text-primary-200" />
+            <span className="text-xs font-bold text-primary-100">{mockUser.credits}</span>
+          </div>
+          <button
+            onClick={() => {
+              console.log("Burger clicked", !open);
+              setOpen(!open);
+            }}
+            type="button"
+            aria-label="Toggle menu"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              width: "32px",
+              height: "32px",
+              color: "white",
+              background: open ? "rgba(255,255,255,0.1)" : "transparent",
+              border: "none",
+              borderRadius: "0.5rem",
+              cursor: "pointer",
+              zIndex: 101,
+              position: "relative",
+            }}
+          >
+            {open ? (
+              <X className="size-5" />
+            ) : (
+              <div className="flex flex-col gap-1 items-end">
+                <div className="w-5 h-0.5 bg-white rounded-full" />
+                <div className="w-3 h-0.5 bg-white rounded-full" />
+                <div className="w-5 h-0.5 bg-white rounded-full" />
+              </div>
+            )}
+          </button>
+        </div>
       </div>
 
       {/* Overlay */}
@@ -180,17 +188,27 @@ export default function MobileNav() {
           })}
         </nav>
 
-        {/* User Info */}
+        {/* User Info & Log Out */}
         <div style={{ borderTop: "1px solid rgba(255,255,255,0.1)", paddingTop: "1.5rem", marginTop: "auto" }}>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 mb-6">
             <div className="size-10 rounded-full bg-primary-200/20 flex-center">
-              <span className="text-primary-200 text-sm font-bold">E</span>
+              <span className="text-primary-200 text-sm font-bold">
+                {mockUser.name.charAt(0)}
+              </span>
             </div>
             <div className="min-w-0">
-              <p className="text-sm text-white font-medium truncate">Eddy</p>
-              <p className="text-xs text-light-400">Pro Plan</p>
+              <p className="text-sm text-white font-medium truncate">{mockUser.name}</p>
+              <p className="text-xs text-light-400">{mockUser.credits} credits</p>
             </div>
           </div>
+          <Link
+            href="/auth/sign-in"
+            onClick={() => setOpen(false)}
+            className="sidebar-link text-destructive-100 hover:bg-destructive-100/10"
+          >
+            <LogOut className="size-5" />
+            <span>Sign Out</span>
+          </Link>
         </div>
       </div>
     </div>
