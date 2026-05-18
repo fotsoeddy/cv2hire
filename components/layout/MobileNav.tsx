@@ -51,8 +51,8 @@ export default function MobileNav() {
 
       {/* Dropdown nav */}
       {open && (
-        <div className="fixed inset-0 top-14 z-40 dark-gradient p-4 animate-fadeIn">
-          <nav className="flex flex-col gap-1">
+        <div className="fixed inset-0 top-16 z-[70] dark-gradient p-4 animate-fadeIn">
+          <nav className="flex flex-col gap-2 mt-4">
             {navItems.map((item) => {
               const Icon = iconMap[item.icon];
               const isActive =

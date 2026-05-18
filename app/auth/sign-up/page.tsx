@@ -22,8 +22,8 @@ export default function SignUpPage() {
   };
 
   return (
-    <div className="card-border lg:min-w-[520px]">
-      <div className="flex flex-col gap-6 card py-14 px-10">
+    <div className="w-full max-w-[520px] card-border">
+      <div className="flex flex-col gap-6 card py-10 px-6 sm:py-14 sm:px-10">
         <div className="flex flex-row gap-2 justify-center">
           <div className="size-9 rounded-lg primary-gradient flex-center">
             <span className="text-white font-bold text-sm">C2</span>

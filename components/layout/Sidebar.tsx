@@ -15,7 +15,8 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { mockUser } from "@/constants/mock-data";
-import { useState } from "react";
+
+import { useSidebar } from "@/components/layout/SidebarContext";
 
 const iconMap: Record<string, React.ElementType> = {
   LayoutDashboard,
@@ -36,12 +37,12 @@ const navItems = [
 
 export default function Sidebar() {
   const pathname = usePathname();
-  const [collapsed, setCollapsed] = useState(false);
+  const { collapsed, setCollapsed } = useSidebar();
 
   return (
     <aside
       className={cn(
-        "fixed left-0 top-0 h-screen dark-gradient border-r border-border flex flex-col py-6 z-50 transition-all duration-300 max-lg:hidden",
+        "fixed left-0 top-0 h-screen dark-gradient border-r border-border flex flex-col py-6 z-[60] transition-all duration-300 max-lg:hidden",
         collapsed ? "w-20 px-3" : "w-64 px-6"
       )}
     >
