@@ -131,24 +131,47 @@ export default function LandingPage() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
-              { role: "Frontend Developer", company: "Google", type: "Technical" },
-              { role: "Product Manager", company: "Meta", type: "Mixed" },
-              { role: "Backend Engineer", company: "Spotify", type: "Technical" },
+              {
+                role: "Frontend Developer",
+                company: "Google",
+                logo: "https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_\"G\"_Logo.svg",
+                desc: "Work on world-class user interfaces using React and Next.js.",
+                tech: ["React", "Next.js", "Tailwind"]
+              },
+              {
+                role: "Product Manager",
+                company: "Meta",
+                logo: "https://upload.wikimedia.org/wikipedia/commons/7/7b/Meta_Platforms_Inc._logo.svg",
+                desc: "Drive product strategy and execution for global social platforms.",
+                tech: ["Agile", "Jira", "Strategy"]
+              },
+              {
+                role: "Backend Engineer",
+                company: "Spotify",
+                logo: "https://upload.wikimedia.org/wikipedia/commons/1/19/Spotify_logo_without_text.svg",
+                desc: "Scale high-performance APIs for millions of music lovers.",
+                tech: ["Node.js", "Python", "Redis"]
+              },
             ].map((job, i) => (
-              <div key={i} className="card p-6 border border-white/5 hover:border-primary-200/30 transition-all flex flex-col justify-between">
-                <div>
-                  <div className="flex justify-between items-start mb-4">
-                    <div className="size-10 rounded-lg bg-white/5 flex-center">
-                      <Briefcase className="size-5 text-light-400" />
-                    </div>
-                    <span className="px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider bg-primary-200/10 text-primary-200">
-                      {job.type}
-                    </span>
+              <div key={i} className="card p-6 border border-white/5 hover:border-primary-200/30 transition-all flex flex-col">
+                <div className="flex justify-between items-start mb-4">
+                  <div className="size-10 rounded-lg bg-white/5 p-2 flex-center overflow-hidden">
+                    <img src={job.logo} alt={job.company} className="size-full object-contain" />
                   </div>
-                  <h3 className="text-lg font-bold mb-1">{job.role}</h3>
-                  <p className="text-sm text-light-400 mb-6">{job.company}</p>
+                  <div className="flex gap-1">
+                    {job.tech.map((t) => (
+                      <span key={t} className="px-1.5 py-0.5 rounded-md text-[9px] font-bold bg-white/5 text-light-400">
+                        {t}
+                      </span>
+                    ))}
+                  </div>
                 </div>
-                <Link href="/auth/sign-up" className="btn-secondary w-full text-xs">
+                <h3 className="text-lg font-bold mb-1 text-white">{job.role}</h3>
+                <p className="text-xs text-primary-200 mb-3 font-medium">{job.company}</p>
+                <p className="text-xs text-light-400 mb-6 leading-relaxed flex-1">
+                  {job.desc}
+                </p>
+                <Link href="/auth/sign-up" className="btn-secondary w-full text-xs py-2 min-h-0">
                   Prepare for this role
                 </Link>
               </div>
@@ -177,9 +200,6 @@ export default function LandingPage() {
               }
             ].map((t, i) => (
               <div key={i} className="card p-8 text-left relative overflow-hidden">
-                <div className="absolute top-0 right-0 p-4 opacity-10">
-                  <Zap className="size-12 text-primary-200" />
-                </div>
                 <p className="text-lg italic text-light-100 mb-8 font-medium relative z-10">"{t.quote}"</p>
                 <div className="flex items-center gap-3 relative z-10">
                   <div className="size-10 rounded-full bg-primary-200/20 flex-center text-primary-200 font-bold border border-primary-200/20">
@@ -197,15 +217,15 @@ export default function LandingPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="main-section py-24 pb-40">
-        <div className="card-cta w-full max-w-4xl flex flex-col md:flex-row items-center gap-8 px-12 py-12 rounded-3xl relative overflow-hidden">
+      <section className="main-section py-20 pb-32">
+        <div className="card-cta w-full max-w-4xl flex flex-col md:flex-row items-center gap-8 px-8 py-10 rounded-3xl relative overflow-hidden">
           <div className="absolute top-0 right-0 w-1/2 h-full bg-primary-200/5 blur-[120px] -z-1" />
           <div className="flex-1 text-center md:text-left">
-            <h2 className="text-3xl font-bold text-white mb-3">
-              Ready to land your <span className="text-gradient">Dream Job?</span>
+            <h2 className="text-3xl font-bold text-white mb-3 leading-tight">
+              Ready to land your <br /> <span className="text-gradient">Dream Job?</span>
             </h2>
-            <p className="text-light-100/80 text-lg">
-              Join 10,000+ professionals using CV2Hire to prepare for their next career move.
+            <p className="text-light-100/80">
+              Join 10,000+ professionals using CV2Hire today.
             </p>
           </div>
           <Link href="/auth/sign-up" className="btn-primary px-8 flex items-center gap-2 whitespace-nowrap">

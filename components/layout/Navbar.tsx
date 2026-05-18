@@ -18,7 +18,7 @@ export default function Navbar() {
         <Link href="/auth/sign-in" className="btn-ghost text-sm">
           Sign In
         </Link>
-        <Link href="/auth/sign-up" className="btn-primary text-sm">
+        <Link href="/auth/sign-up" className="btn-primary text-xs px-4">
           Get Started
         </Link>
       </div>

@@ -82,7 +82,7 @@ export default function InterviewCard({
                 )}
               >
                 <span className="tech-tooltip">{tech}</span>
-                <Image src={url} alt={tech} width={100} height={100} className="size-5" />
+                <Image src={url} alt={tech} width={100} height={100} className="size-6" />
               </div>
             ))}
           </div>
@@ -93,9 +93,9 @@ export default function InterviewCard({
                 ? `/dashboard/interviews/feedback/${interviewId}`
                 : `/dashboard/interviews/session/${interviewId}`
             }
-            className="btn-primary text-sm"
+            className="btn-primary text-xs px-4"
           >
-            {feedback ? "Check Feedback" : "View Interview"}
+            {feedback ? "Check Feedback" : "Start"}
           </Link>
         </div>
       </div>
