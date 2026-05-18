@@ -1,26 +1,348 @@
+@import url("https://fonts.googleapis.com/css2?family=Mona+Sans:ital,wght@0,200..900;1,200..900&display=swap");
 @import "tailwindcss";
+@plugin "tailwindcss-animate";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+  --font-sans: "Mona Sans", ui-sans-serif, system-ui, sans-serif,
+    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+
+  /* PrepWise palette */
+  --color-success-100: #49de50;
+  --color-success-200: #42c748;
+  --color-destructive-100: #f75353;
+  --color-destructive-200: #c44141;
+
+  --color-primary-100: #dddfff;
+  --color-primary-200: #cac5fe;
+
+  --color-light-100: #d6e0ff;
+  --color-light-400: #6870a6;
+  --color-light-600: #4f557d;
+  --color-light-800: #24273a;
+
+  --color-dark-100: #020408;
+  --color-dark-200: #27282f;
+  --color-dark-300: #242633;
+
+  /* Resumind palette */
+  --color-resume-pink: #AB8C95;
+  --color-resume-blue: #8E97C5;
+
+  --color-badge-green: #d5faf1;
+  --color-badge-red: #f9e3e2;
+  --color-badge-yellow: #fceed8;
+  --color-badge-green-text: #254d4a;
+  --color-badge-red-text: #752522;
+  --color-badge-yellow-text: #73321b;
+}
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --radius: 0.625rem;
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.922 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: var(--light-100);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.556 0 0);
 }
 
 @theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* =========================================
+   BASE STYLES
+   ========================================= */
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  h1 {
+    @apply text-5xl font-bold tracking-tight;
+  }
+  h2 {
+    @apply text-3xl font-semibold;
+  }
+  h3 {
+    @apply text-2xl font-semibold;
+  }
+  p {
+    @apply text-light-100;
+  }
+  ul {
+    @apply list-disc list-inside;
+  }
+  li {
+    @apply text-light-100;
+  }
+  label {
+    @apply text-light-100 text-sm;
+  }
+  input {
+    @apply w-full bg-dark-200 rounded-full min-h-12 px-5 placeholder:text-light-100 focus:outline-none;
+  }
+  textarea {
+    @apply w-full bg-dark-200 rounded-2xl min-h-24 px-5 py-3 placeholder:text-light-100 focus:outline-none;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* =========================================
+   COMPONENT CLASSES
+   ========================================= */
+
+@layer components {
+  /* --- Text & Gradients --- */
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary-200 via-white to-primary-100;
+  }
+
+  /* --- Buttons --- */
+  .btn-primary {
+    @apply w-fit primary-gradient text-dark-100 hover:opacity-90 rounded-full font-bold px-6 py-2.5 cursor-pointer min-h-10 transition-opacity;
+  }
+  .btn-secondary {
+    @apply w-fit bg-dark-200 text-primary-200 hover:bg-dark-200/80 rounded-full font-bold px-6 py-2.5 cursor-pointer min-h-10 transition-colors;
+  }
+  .btn-ghost {
+    @apply w-fit text-light-100 hover:text-white hover:bg-white/5 rounded-full font-medium px-6 py-2.5 cursor-pointer min-h-10 transition-colors;
+  }
+  .btn-call {
+    @apply inline-block px-7 py-3 font-bold text-sm text-white transition-colors bg-success-100 rounded-full shadow-sm hover:bg-success-200 min-w-28 cursor-pointer;
+  }
+  .btn-disconnect {
+    @apply inline-block px-7 py-3 text-sm font-bold text-white transition-colors bg-destructive-100 rounded-full shadow-sm hover:bg-destructive-200 min-w-28 cursor-pointer;
+  }
+  .auth-button {
+    @apply w-full primary-gradient rounded-full py-4 px-8 cursor-pointer text-lg font-semibold text-dark-100 hover:opacity-90 transition-opacity;
+  }
+
+  /* --- Cards & Borders --- */
+  .card-border {
+    @apply border-gradient p-0.5 rounded-2xl;
+  }
+  .card {
+    @apply dark-gradient rounded-2xl;
+  }
+  .gradient-border {
+    @apply bg-gradient-to-b from-[#c1d3f81a] to-[#a7bff14d] p-3 rounded-2xl;
+  }
+
+  /* --- Layouts --- */
+  .auth-layout {
+    @apply flex items-center justify-center min-h-screen px-4 py-8;
+  }
+  .root-layout {
+    @apply flex mx-auto max-w-7xl flex-col gap-12 my-12 px-16 max-sm:px-4 max-sm:my-8;
+  }
+  .main-section {
+    @apply flex flex-col items-center gap-8 pt-12 mx-auto max-w-7xl pb-5 px-4;
+  }
+  .page-heading {
+    @apply flex flex-col items-center gap-4 max-w-4xl text-center;
+  }
+
+  /* --- Navbar --- */
+  .navbar {
+    @apply flex flex-row justify-between items-center p-4 w-full px-8 max-w-7xl mx-auto;
+  }
+
+  /* --- Forms --- */
+  .form-div {
+    @apply flex flex-col gap-2 w-full items-start;
+  }
+
+  /* --- Resume/CV Specific --- */
+  .resume-card {
+    @apply flex flex-col gap-6 w-full lg:w-[420px] card p-5 rounded-2xl;
+  }
+  .resume-card-header {
+    @apply flex flex-row gap-2 justify-between items-center;
+  }
+  .resume-summary {
+    @apply flex flex-row items-center justify-center p-4 gap-4;
+
+    .category {
+      @apply flex flex-row gap-2 items-center bg-dark-300 rounded-2xl p-4 w-full justify-between;
+    }
+  }
+  .feedback-section {
+    @apply flex flex-col gap-8 w-1/2 px-8 max-lg:w-full py-6;
+  }
+  .uploader-selected-file {
+    @apply flex items-center justify-between p-3 bg-dark-300 rounded-2xl;
+  }
+
+  /* --- Interview Specific --- */
+  .card-cta {
+    @apply flex flex-row blue-gradient-dark rounded-3xl px-16 py-6 items-center justify-between max-sm:px-4;
+  }
+  .interviews-section {
+    @apply flex flex-wrap gap-4 max-lg:flex-col w-full items-stretch;
+  }
+  .card-interview {
+    @apply dark-gradient rounded-2xl min-h-full flex flex-col p-6 relative overflow-hidden gap-8 justify-between;
+
+    .badge-text {
+      @apply text-sm font-semibold capitalize;
+    }
+  }
+  .call-view {
+    @apply flex sm:flex-row flex-col gap-10 items-center justify-between w-full;
+
+    h3 {
+      @apply text-center text-primary-100 mt-5;
+    }
+
+    .card-interviewer {
+      @apply flex items-center justify-center flex-col gap-2 p-7 h-[400px] blue-gradient-dark rounded-lg border-2 border-primary-200/50 flex-1 sm:basis-1/2 w-full;
+    }
+
+    .avatar {
+      @apply z-10 flex items-center justify-center blue-gradient rounded-full size-[120px] relative;
+
+      .animate-speak {
+        @apply absolute inline-flex size-5/6 animate-ping rounded-full bg-primary-200 opacity-75;
+      }
+    }
+
+    .card-border {
+      @apply border-gradient p-0.5 rounded-2xl flex-1 sm:basis-1/2 w-full h-[400px] max-md:hidden;
+    }
+
+    .card-content {
+      @apply flex flex-col gap-2 justify-center items-center p-7 dark-gradient rounded-2xl min-h-full;
+    }
+  }
+  .transcript-border {
+    @apply border-gradient p-0.5 rounded-2xl w-full;
+
+    .transcript {
+      @apply dark-gradient rounded-2xl min-h-12 px-5 py-3 flex items-center justify-center;
+
+      p {
+        @apply text-lg text-center text-white;
+      }
+    }
+  }
+  .section-feedback {
+    @apply flex flex-col gap-8 max-w-5xl mx-auto max-sm:px-4 text-lg leading-7;
+
+    .buttons {
+      @apply flex w-full justify-evenly gap-4 max-sm:flex-col max-sm:items-center;
+    }
+  }
+  .tech-tooltip {
+    @apply absolute bottom-full mb-1 hidden group-hover:flex px-2 py-1 text-xs text-white bg-gray-700 rounded-md shadow-md;
+  }
+
+  /* --- Score badges (from Resumind) --- */
+  .score-badge-green {
+    @apply bg-badge-green text-badge-green-text;
+  }
+  .score-badge-yellow {
+    @apply bg-badge-yellow text-badge-yellow-text;
+  }
+  .score-badge-red {
+    @apply bg-badge-red text-badge-red-text;
+  }
+
+  /* --- Dashboard --- */
+  .stat-card {
+    @apply card p-6 rounded-2xl flex flex-col gap-2;
+  }
+  .sidebar {
+    @apply fixed left-0 top-0 h-screen w-64 dark-gradient border-r border-border flex flex-col p-6 gap-6 z-50;
+  }
+  .sidebar-link {
+    @apply flex items-center gap-3 px-4 py-3 rounded-xl text-light-100 hover:bg-white/5 hover:text-white transition-colors;
+  }
+  .sidebar-link-active {
+    @apply bg-primary-200/10 text-primary-200;
+  }
+}
+
+/* =========================================
+   UTILITIES
+   ========================================= */
+
+@utility dark-gradient {
+  @apply bg-gradient-to-b from-[#1A1C20] to-[#08090D];
+}
+
+@utility border-gradient {
+  @apply bg-gradient-to-b from-[#4B4D4F] to-[#4B4D4F33];
+}
+
+@utility pattern {
+  @apply bg-[url('/pattern.png')] bg-top bg-no-repeat;
+}
+
+@utility blue-gradient-dark {
+  @apply bg-gradient-to-b from-[#171532] to-[#08090D];
+}
+
+@utility blue-gradient {
+  @apply bg-gradient-to-l from-[#FFFFFF] to-[#CAC5FE];
+}
+
+@utility primary-gradient {
+  background: linear-gradient(to bottom, #8e98ff, #606beb);
+}
+
+@utility flex-center {
+  @apply flex items-center justify-center;
+}
+
+@utility animate-fadeIn {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@utility inset-shadow-input {
+  box-shadow: inset 0 0 12px 0 rgba(108, 99, 255, 0.15);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
