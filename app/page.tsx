@@ -217,19 +217,18 @@ export default function LandingPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="main-section py-20 pb-32">
-        <div className="card-cta w-full max-w-4xl flex flex-col md:flex-row items-center gap-8 px-8 py-10 rounded-3xl relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-1/2 h-full bg-primary-200/5 blur-[120px] -z-1" />
-          <div className="flex-1 text-center md:text-left">
-            <h2 className="text-3xl font-bold text-white mb-3 leading-tight">
-              Ready to land your <br /> <span className="text-gradient">Dream Job?</span>
+      <section className="w-full mt-20">
+        <div className="card-cta flex flex-col md:flex-row items-center justify-between gap-8 md:gap-4 p-8 md:p-12 text-center md:text-left">
+          <div>
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+              Ready to land your <span className="text-primary-200">Dream Job?</span>
             </h2>
-            <p className="text-light-100/80">
-              Join 10,000+ professionals using CV2Hire today.
+            <p className="text-light-400 text-lg max-w-xl mx-auto md:mx-0">
+              Join 10,000+ professionals using CV2Hire to prepare for their next career move.
             </p>
           </div>
-          <Link href="/auth/sign-up" className="btn-primary px-8 flex items-center gap-2 whitespace-nowrap">
-            Start Now <ArrowRight className="size-4" />
+          <Link href="/dashboard" className="btn-primary text-base px-8 py-3 w-full md:w-auto min-h-0">
+            Start Now &rarr;
           </Link>
         </div>
       </section>

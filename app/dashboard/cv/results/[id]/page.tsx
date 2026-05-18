@@ -35,24 +35,31 @@ export default async function CVResultsPage({
 
   return (
     <div className="space-y-8">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 md:gap-4">
+        <div className="flex-1">
           <Link
             href="/dashboard"
-            className="flex items-center gap-2 text-light-400 hover:text-white transition-colors mb-3 text-sm"
+            className="flex items-center gap-2 text-light-400 hover:text-white transition-colors mb-4 text-xs font-medium"
           >
             <ArrowLeft className="size-4" /> Back to Dashboard
           </Link>
-          <h2>CV Analysis Results</h2>
-          <p className="text-light-400 mt-1">
+          <h2 className="text-2xl md:text-3xl font-bold text-white leading-tight">CV Analysis Results</h2>
+          <p className="text-xs md:text-sm text-light-400 mt-2 leading-relaxed opacity-80">
             {analysis.fileName}
-            {analysis.jobTitle && ` · ${analysis.jobTitle} at ${analysis.companyName}`}
+            {analysis.jobTitle && (
+              <>
+                <span className="mx-1 hidden md:inline">·</span>
+                <br className="md:hidden" />
+                {analysis.jobTitle} at {analysis.companyName}
+              </>
+            )}
           </p>
         </div>
-        <Link href="/dashboard/cv/upload" className="btn-primary text-sm">
-          Analyze Another CV
-        </Link>
+        <div className="flex w-full md:w-auto">
+          <Link href="/dashboard/cv/upload" className="btn-primary text-xs px-8 py-2.5 w-full md:w-auto min-h-0">
+            Analyze Another CV
+          </Link>
+        </div>
       </div>
 
       {/* Results Grid */}

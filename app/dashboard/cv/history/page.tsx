@@ -54,19 +54,19 @@ export default function CVHistoryPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3 mt-auto">
+              <div className="flex flex-col sm:grid sm:grid-cols-2 gap-3 mt-auto">
                 <Link
                   href={`/dashboard/cv/results/${cv.id}`}
-                  className="btn-secondary text-[11px] py-1.5 min-h-0 flex-center gap-2"
+                  className="btn-secondary text-xs py-2 min-h-0 flex-center gap-2 w-full"
                 >
-                  <Eye className="size-3.5" />
+                  <Eye className="size-4" />
                   View Report
                 </Link>
                 <button
                   onClick={() => alert("Downloading CV...")}
-                  className="btn-ghost border border-white/10 text-[11px] py-1.5 min-h-0 flex-center gap-2 hover:bg-white/5"
+                  className="btn-ghost border border-white/10 text-xs py-2 min-h-0 flex-center gap-2 hover:bg-white/5 w-full"
                 >
-                  <Download className="size-3.5" />
+                  <Download className="size-4" />
                   Download
                 </button>
               </div>

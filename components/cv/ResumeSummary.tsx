@@ -17,8 +17,8 @@ export default function ResumeSummary({ feedback }: ResumeSummaryProps) {
   return (
     <div className="flex flex-col gap-6 items-center">
       {/* Overall Score */}
-      <div className="flex flex-col items-center gap-3 card p-6 rounded-2xl w-full">
-        <h3 className="text-lg font-semibold text-white">Overall Score</h3>
+      <div className="flex flex-col items-center gap-4 card p-5 md:p-6 rounded-2xl w-full border border-white/5">
+        <h3 className="text-base font-semibold text-white">Overall Score</h3>
         <ScoreGauge score={feedback.overallScore} />
         <ScoreBadge score={feedback.overallScore} />
       </div>

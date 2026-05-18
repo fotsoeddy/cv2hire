@@ -190,9 +190,9 @@
 @media (max-width: 640px) {
   .btn-primary, .btn-secondary, .btn-ghost, .auth-button {
     width: 100%;
-    min-height: 2.75rem;
-    font-size: 0.9375rem;
-    padding: 0.5rem 1.25rem;
+    min-height: 2.5rem;
+    font-size: 0.875rem;
+    padding: 0.5rem 1rem;
   }
 }
 
@@ -393,7 +393,6 @@
 /* --- Interview Specific --- */
 .card-cta {
   display: flex;
-  flex-direction: row;
   background: linear-gradient(to bottom, #171532, #08090D);
   border-radius: 1.5rem;
   padding: 1rem 1.5rem;
@@ -403,8 +402,10 @@
 }
 @media (max-width: 640px) {
   .card-cta {
-    padding: 1rem;
-    gap: 1rem;
+    padding: 1.5rem 1rem;
+    gap: 1.5rem;
+    flex-direction: column;
+    text-align: center;
   }
 }
 
