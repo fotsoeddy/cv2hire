@@ -372,3 +372,33 @@ export const mockTranscript = [
   { role: "assistant" as const, content: "Excellent explanation. Now, how do you typically manage state in a large React application?" },
   { role: "user" as const, content: "For global state I usually use Zustand or Redux Toolkit. For server state, I prefer React Query. And for local component state, I use React's built-in useState and useReducer hooks." },
 ];
+
+// ==========================================
+// CV History
+// ==========================================
+export const mockCVHistory: Partial<CVAnalysis>[] = [
+  {
+    id: "cv-1",
+    fileName: "Senior_Frontend_Dev_2026.pdf",
+    jobTitle: "Senior Frontend Developer",
+    companyName: "Google",
+    createdAt: "2026-05-10T14:30:00Z",
+    feedback: { overallScore: 82 } as any,
+  },
+  {
+    id: "cv-2",
+    fileName: "Resume_Product_Manager.pdf",
+    jobTitle: "Product Manager",
+    companyName: "Meta",
+    createdAt: "2026-05-12T09:15:00Z",
+    feedback: { overallScore: 74 } as any,
+  },
+  {
+    id: "cv-3",
+    fileName: "Backend_Engineer_Spotify.pdf",
+    jobTitle: "Backend Engineer",
+    companyName: "Spotify",
+    createdAt: "2026-05-15T16:45:00Z",
+    feedback: { overallScore: 88 } as any,
+  },
+];
