@@ -13,6 +13,7 @@ import {
   LogOut,
   ChevronLeft,
   ChevronRight,
+  Zap,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { mockUser } from "@/constants/mock-data";
@@ -26,11 +27,13 @@ const iconMap: Record<string, React.ElementType> = {
   Mic,
   CreditCard,
   Settings,
+  Zap,
 };
 
 const navItems = [
   { label: "Dashboard", href: "/dashboard", icon: "LayoutDashboard" },
-  { label: "CV Analyzer", href: "/dashboard/cv/upload", icon: "FileText" },
+  { label: "My CVs", href: "/dashboard/cv/history", icon: "FileText" },
+  { label: "CV Analyzer", href: "/dashboard/cv/upload", icon: "Zap" },
   { label: "Jobs", href: "/dashboard/jobs", icon: "Briefcase" },
   { label: "Pricing", href: "/dashboard/pricing", icon: "CreditCard" },
   { label: "Settings", href: "/dashboard/settings", icon: "Settings" },
