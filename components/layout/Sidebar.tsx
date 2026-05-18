@@ -48,17 +48,15 @@ export default function Sidebar() {
       )}
     >
       {/* Logo */}
-      <Link href="/dashboard" className="flex items-center gap-2 mb-8">
+      <Link href="/dashboard" className="flex items-center justify-center mb-10 w-full">
         <Image
           src="/logo.png"
           alt="CV2Hire Logo"
-          width={36}
-          height={36}
-          className="object-contain flex-shrink-0"
+          width={collapsed ? 48 : 140}
+          height={48}
+          className="object-contain flex-shrink-0 transition-all duration-300"
+          priority
         />
-        {!collapsed && (
-          <h2 className="text-xl font-bold text-primary-100">CV2Hire</h2>
-        )}
       </Link>
 
       {/* Nav Links */}

@@ -17,15 +17,15 @@ export default function ForgotPasswordPage() {
   return (
     <div className="w-full max-w-[520px] card-border">
       <div className="flex flex-col gap-6 card py-10 px-6 sm:py-14 sm:px-10">
-        <div className="flex flex-row gap-2 justify-center">
+        <div className="flex justify-center mb-4">
           <Image
             src="/logo.png"
             alt="CV2Hire Logo"
-            width={40}
-            height={40}
+            width={200}
+            height={60}
             className="object-contain"
+            priority
           />
-          <span className="text-white font-bold text-2xl self-center">CV2Hire</span>
         </div>
 
         <h3 className="text-center">Reset your password</h3>

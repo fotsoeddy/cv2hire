@@ -65,15 +65,15 @@ export default function MobileNav() {
           padding: "0.75rem 1rem",
         }}
       >
-        <Link href="/dashboard" className="flex items-center gap-2">
+        <Link href="/dashboard" className="flex items-center">
           <Image
             src="/logo.png"
             alt="CV2Hire Logo"
-            width={32}
-            height={32}
+            width={110}
+            height={36}
             className="object-contain"
+            priority
           />
-          <span className="text-lg font-bold text-primary-100">CV2Hire</span>
         </Link>
         <button
           onClick={() => {
@@ -145,15 +145,14 @@ export default function MobileNav() {
         }}
       >
         {/* Logo */}
-        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "2.5rem" }}>
+        <div style={{ marginBottom: "3rem", display: "flex", justifyContent: "center" }}>
           <Image
             src="/logo.png"
             alt="CV2Hire Logo"
-            width={36}
-            height={36}
+            width={160}
+            height={50}
             className="object-contain"
           />
-          <span className="text-xl font-bold text-primary-100">CV2Hire</span>
         </div>
 
         {/* Nav Links */}
