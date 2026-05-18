@@ -12,7 +12,7 @@ import {
   X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const iconMap: Record<string, React.ElementType> = {
   LayoutDashboard,
@@ -34,49 +34,120 @@ export default function MobileNav() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
+  // Lock body scroll when drawer is open
+  useEffect(() => {
+    if (open) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [open]);
+
   return (
     <div className="lg:hidden">
-      {/* Top bar */}
-      <div className="fixed top-0 left-0 right-0 z-[80] dark-gradient border-b border-border flex items-center justify-between px-4 py-3">
+      {/* Fixed Top Bar */}
+      <div
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          zIndex: 100,
+          background: "linear-gradient(to bottom, #1A1C20, #08090D)",
+          borderBottom: "1px solid rgba(255,255,255,0.1)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          padding: "0.75rem 1rem",
+        }}
+      >
         <Link href="/dashboard" className="flex items-center gap-2">
           <div className="size-8 rounded-lg primary-gradient flex-center">
             <span className="text-white font-bold text-xs">C2</span>
           </div>
           <span className="text-lg font-bold text-primary-100">CV2Hire</span>
         </Link>
-        <button 
-          onClick={() => setOpen(!open)} 
-          className="text-white p-2 hover:bg-white/10 rounded-lg transition-colors"
+        <button
+          onClick={() => {
+            console.log("Burger clicked", !open);
+            setOpen(!open);
+          }}
           type="button"
           aria-label="Toggle menu"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            width: "48px",
+            height: "48px",
+            color: "white",
+            background: open ? "rgba(255,255,255,0.1)" : "transparent",
+            border: "none",
+            borderRadius: "0.75rem",
+            cursor: "pointer",
+            zIndex: 101,
+            position: "relative",
+          }}
         >
-          {open ? <X className="size-6" /> : <Menu className="size-6" />}
+          {open ? (
+            <X className="size-8" />
+          ) : (
+            <div className="flex flex-col gap-1.5 items-end">
+              <div className="w-8 h-1 bg-white rounded-full" />
+              <div className="w-6 h-1 bg-white rounded-full" />
+              <div className="w-8 h-1 bg-white rounded-full" />
+            </div>
+          )}
         </button>
       </div>
 
-      {/* Drawer Overlay */}
-      <div 
-        className={cn(
-          "fixed inset-0 z-[90] bg-black/60 backdrop-blur-sm transition-opacity duration-300",
-          open ? "opacity-100" : "opacity-0 pointer-events-none"
-        )}
-        onClick={() => setOpen(false)}
-      />
+      {/* Overlay */}
+      {open && (
+        <div
+          onClick={() => {
+            console.log("Overlay clicked, closing");
+            setOpen(false);
+          }}
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 90,
+            backgroundColor: "rgba(0,0,0,0.6)",
+            backdropFilter: "blur(4px)",
+          }}
+        />
+      )}
 
       {/* Side Drawer */}
       <div
-        className={cn(
-          "fixed top-0 left-0 bottom-0 z-[100] w-[280px] dark-gradient border-r border-border p-6 transition-transform duration-300 ease-in-out flex flex-col",
-          open ? "translate-x-0" : "-translate-x-full"
-        )}
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          bottom: 0,
+          zIndex: 110,
+          width: "280px",
+          background: "linear-gradient(to bottom, #1A1C20, #08090D)",
+          borderRight: "1px solid rgba(255,255,255,0.1)",
+          padding: "1.5rem",
+          display: "flex",
+          flexDirection: "column",
+          transition: "transform 0.3s ease-in-out",
+          transform: open ? "translateX(0)" : "translateX(-100%)",
+        }}
       >
-        <div className="flex items-center gap-2 mb-10">
+        {/* Logo */}
+        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "2.5rem" }}>
           <div className="size-9 rounded-lg primary-gradient flex-center">
             <span className="text-white font-bold text-sm">C2</span>
           </div>
           <span className="text-xl font-bold text-primary-100">CV2Hire</span>
         </div>
 
+        {/* Nav Links */}
         <nav className="flex flex-col gap-2 flex-1">
           {navItems.map((item) => {
             const Icon = iconMap[item.icon];
@@ -101,8 +172,8 @@ export default function MobileNav() {
           })}
         </nav>
 
-        {/* User Info in drawer */}
-        <div className="border-t border-border pt-6 mt-auto">
+        {/* User Info */}
+        <div style={{ borderTop: "1px solid rgba(255,255,255,0.1)", paddingTop: "1.5rem", marginTop: "auto" }}>
           <div className="flex items-center gap-3">
             <div className="size-10 rounded-full bg-primary-200/20 flex-center">
               <span className="text-primary-200 text-sm font-bold">E</span>

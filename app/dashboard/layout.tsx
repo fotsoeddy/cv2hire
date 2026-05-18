@@ -29,8 +29,8 @@ export default function DashboardLayout({
     <SidebarProvider>
       <div className="min-h-screen">
         <Sidebar />
-        <MobileNav />
         <DashboardContent>{children}</DashboardContent>
+        <MobileNav />
       </div>
     </SidebarProvider>
   );
