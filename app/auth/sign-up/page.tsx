@@ -29,8 +29,8 @@ export default function SignUpPage() {
           <Image
             src="/logo.png"
             alt="CV2Hire Logo"
-            width={200}
-            height={60}
+            width={140}
+            height={46}
             className="object-contain"
             priority
           />

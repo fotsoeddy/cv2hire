@@ -52,8 +52,8 @@ export default function Sidebar() {
         <Image
           src="/logo.png"
           alt="CV2Hire Logo"
-          width={collapsed ? 48 : 140}
-          height={48}
+          width={collapsed ? 40 : 110}
+          height={40}
           className="object-contain flex-shrink-0 transition-all duration-300"
           priority
         />

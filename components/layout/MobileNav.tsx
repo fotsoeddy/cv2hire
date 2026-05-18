@@ -69,8 +69,8 @@ export default function MobileNav() {
           <Image
             src="/logo.png"
             alt="CV2Hire Logo"
-            width={110}
-            height={36}
+            width={90}
+            height={30}
             className="object-contain"
             priority
           />
@@ -149,8 +149,8 @@ export default function MobileNav() {
           <Image
             src="/logo.png"
             alt="CV2Hire Logo"
-            width={160}
-            height={50}
+            width={120}
+            height={40}
             className="object-contain"
           />
         </div>
