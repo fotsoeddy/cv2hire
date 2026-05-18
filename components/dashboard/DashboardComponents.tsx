@@ -28,7 +28,7 @@ export function RecentActivityCard({ item }: { item: ActivityItem }) {
   const color = item.score ? getScoreColor(item.score) : "green";
 
   return (
-    <div className="flex items-center gap-4 p-4 rounded-xl bg-dark-300 hover:bg-dark-300/80 transition-colors">
+    <div className="flex items-center gap-4 p-3 rounded-xl bg-dark-300 hover:bg-dark-300/80 transition-colors">
       <div
         className={cn(
           "size-10 rounded-full flex-center flex-shrink-0",

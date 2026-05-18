@@ -50,18 +50,17 @@ export default function DashboardPage() {
 
       {/* Quick Actions */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* CV CTA */}
         <Link
           href="/dashboard/cv/upload"
-          className="card-cta flex-col items-start gap-4 p-6 hover:opacity-90 transition-opacity"
+          className="card-cta gap-4 hover:border-primary-200/30 transition-all"
         >
-          <div className="size-12 rounded-xl bg-primary-200/10 flex-center">
-            <FileText className="size-6 text-primary-200" />
+          <div className="size-10 rounded-xl bg-primary-200/10 flex-center flex-shrink-0">
+            <FileText className="size-5 text-primary-200" />
           </div>
-          <div>
-            <h3 className="text-lg font-semibold text-white">Analyze Your CV</h3>
-            <p className="text-sm text-light-400 mt-1">
-              Upload your resume and get instant AI-powered feedback
+          <div className="flex-1">
+            <h3 className="text-base font-semibold text-white">Analyze Your CV</h3>
+            <p className="text-xs text-light-400 mt-0.5">
+              Upload resume & get instant AI feedback
             </p>
           </div>
         </Link>
@@ -69,15 +68,15 @@ export default function DashboardPage() {
         {/* Interview CTA */}
         <Link
           href="/dashboard/jobs"
-          className="card-cta flex-col items-start gap-4 p-6 hover:opacity-90 transition-opacity"
+          className="card-cta gap-4 hover:border-success-100/30 transition-all"
         >
-          <div className="size-12 rounded-xl bg-success-100/10 flex-center">
-            <Mic className="size-6 text-success-100" />
+          <div className="size-10 rounded-xl bg-success-100/10 flex-center flex-shrink-0">
+            <Mic className="size-5 text-success-100" />
           </div>
-          <div>
-            <h3 className="text-lg font-semibold text-white">Mock Interview</h3>
-            <p className="text-sm text-light-400 mt-1">
-              Practice with an AI interviewer for your target role
+          <div className="flex-1">
+            <h3 className="text-base font-semibold text-white">Mock Interview</h3>
+            <p className="text-xs text-light-400 mt-0.5">
+              Practice with AI for your target role
             </p>
           </div>
         </Link>

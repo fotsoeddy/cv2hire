@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import Navbar from "@/components/layout/Navbar";
-import { FileText, Mic, BarChart3, Zap, CheckCircle, ArrowRight } from "lucide-react";
+import { FileText, Mic, BarChart3, Zap, CheckCircle, ArrowRight, Briefcase } from "lucide-react";
 
 const features = [
   {
@@ -56,11 +56,11 @@ export default function LandingPage() {
             Analyze your CV, practice mock interviews, and get AI-powered feedback —
             all in one platform. Land your dream job with confidence.
           </p>
-          <div className="flex gap-4 mt-4">
-            <Link href="/auth/sign-up" className="btn-primary text-base px-8 py-3">
+          <div className="flex flex-col sm:flex-row gap-4 mt-6 justify-center">
+            <Link href="/auth/sign-up" className="btn-primary px-8">
               Get Started Free
             </Link>
-            <Link href="#features" className="btn-ghost text-base px-8 py-3">
+            <Link href="#how-it-works" className="btn-ghost">
               Learn More
             </Link>
           </div>
@@ -87,14 +87,14 @@ export default function LandingPage() {
         <p className="text-center text-light-400 mb-12 max-w-xl">
           One platform combining CV analysis and interview preparation with powerful AI.
         </p>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl w-full">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-4xl w-full">
           {features.map((f) => (
-            <div key={f.title} className="card p-6 rounded-2xl flex flex-col gap-4">
-              <div className="size-12 rounded-xl primary-gradient flex-center">
-                <f.icon className="size-6 text-white" />
+            <div key={f.title} className="card p-5 rounded-2xl flex flex-col gap-3">
+              <div className="size-10 rounded-xl primary-gradient flex-center">
+                <f.icon className="size-5 text-white" />
               </div>
-              <h3 className="text-lg font-semibold text-white">{f.title}</h3>
-              <p className="text-sm text-light-400">{f.description}</p>
+              <h3 className="text-base font-semibold text-white">{f.title}</h3>
+              <p className="text-xs text-light-400 leading-relaxed">{f.description}</p>
             </div>
           ))}
         </div>
@@ -117,18 +117,59 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="main-section py-20 pb-32">
-        <div className="card-cta w-full max-w-4xl flex flex-col md:flex-row items-center gap-8 px-12 py-10">
-          <div className="flex-1">
-            <h2 className="text-2xl font-bold text-white mb-3">
-              Ready to Get Hired?
+      {/* Featured Roles Section */}
+      <section className="main-section py-24 bg-white/[0.02] border-y border-white/5 w-full">
+        <div className="max-w-5xl w-full mx-auto">
+          <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
+            <div className="text-center md:text-left">
+              <h2 className="text-3xl font-bold">Recommended <span className="text-gradient">Roles</span></h2>
+              <p className="text-light-400 mt-2">Practice for the most in-demand positions in tech</p>
+            </div>
+            <Link href="/auth/sign-up" className="text-primary-200 hover:underline text-sm font-medium">
+              View all roles →
+            </Link>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[
+              { role: "Frontend Developer", company: "Google", type: "Technical" },
+              { role: "Product Manager", company: "Meta", type: "Mixed" },
+              { role: "Backend Engineer", company: "Spotify", type: "Technical" },
+            ].map((job, i) => (
+              <div key={i} className="card p-6 border border-white/5 hover:border-primary-200/30 transition-all flex flex-col justify-between">
+                <div>
+                  <div className="flex justify-between items-start mb-4">
+                    <div className="size-10 rounded-lg bg-white/5 flex-center">
+                      <Briefcase className="size-5 text-light-400" />
+                    </div>
+                    <span className="px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider bg-primary-200/10 text-primary-200">
+                      {job.type}
+                    </span>
+                  </div>
+                  <h3 className="text-lg font-bold mb-1">{job.role}</h3>
+                  <p className="text-sm text-light-400 mb-6">{job.company}</p>
+                </div>
+                <Link href="/auth/sign-up" className="btn-secondary w-full text-xs">
+                  Prepare for this role
+                </Link>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="main-section py-24 pb-40">
+        <div className="card-cta w-full max-w-4xl flex flex-col md:flex-row items-center gap-8 px-12 py-12 rounded-3xl relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-1/2 h-full bg-primary-200/5 blur-[120px] -z-1" />
+          <div className="flex-1 text-center md:text-left">
+            <h2 className="text-3xl font-bold text-white mb-3">
+              Ready to land your <span className="text-gradient">Dream Job?</span>
             </h2>
-            <p className="text-light-100">
-              Start your free trial today. No credit card required.
+            <p className="text-light-100/80 text-lg">
+              Join 10,000+ professionals using CV2Hire to prepare for their next career move.
             </p>
           </div>
-          <Link href="/auth/sign-up" className="btn-primary text-base px-8 py-3 flex items-center gap-2">
+          <Link href="/auth/sign-up" className="btn-primary px-8 flex items-center gap-2 whitespace-nowrap">
             Start Now <ArrowRight className="size-4" />
           </Link>
         </div>
