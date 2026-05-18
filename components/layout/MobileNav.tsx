@@ -62,15 +62,15 @@ export default function MobileNav() {
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          padding: "0.75rem 1rem",
+          padding: "0.5rem 1rem",
         }}
       >
         <Link href="/dashboard" className="flex items-center">
           <Image
             src="/logo.png"
             alt="CV2Hire Logo"
-            width={90}
-            height={30}
+            width={32}
+            height={32}
             className="object-contain"
             priority
           />
@@ -149,8 +149,8 @@ export default function MobileNav() {
           <Image
             src="/logo.png"
             alt="CV2Hire Logo"
-            width={120}
-            height={40}
+            width={90}
+            height={30}
             className="object-contain"
           />
         </div>

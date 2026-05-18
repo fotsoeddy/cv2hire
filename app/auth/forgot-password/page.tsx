@@ -21,8 +21,8 @@ export default function ForgotPasswordPage() {
           <Image
             src="/logo.png"
             alt="CV2Hire Logo"
-            width={140}
-            height={46}
+            width={100}
+            height={32}
             className="object-contain"
             priority
           />
