@@ -55,22 +55,24 @@ export default function JobCard({ job, interviewCount = 0 }: JobCardProps) {
         </div>
 
         <div className="flex flex-row justify-between items-end">
-          <div className="flex flex-row">
-            {techIcons.slice(0, 4).map(({ tech, url }, idx) => (
-              <div
-                key={tech}
-                className={cn(
-                  "relative group bg-dark-300 rounded-full p-2 flex-center",
-                  idx >= 1 && "-ml-3"
-                )}
-              >
-                <span className="tech-tooltip">{tech}</span>
-                <Image src={url} alt={tech} width={100} height={100} className="size-5" />
-              </div>
-            ))}
+          <div className="flex flex-row items-center gap-1">
+            <div className="flex flex-row mr-2">
+              {techIcons.slice(0, 4).map(({ tech, url }, idx) => (
+                <div
+                  key={tech}
+                  className={cn(
+                    "relative group bg-white/10 rounded-full p-2 flex-center border border-white/5",
+                    idx >= 1 && "-ml-3"
+                  )}
+                >
+                  <span className="tech-tooltip">{tech}</span>
+                  <Image src={url} alt={tech} width={100} height={100} className="size-6" />
+                </div>
+              ))}
+            </div>
           </div>
 
-          <Link href={`/dashboard/jobs/${job.id}`} className="btn-primary text-sm">
+          <Link href={`/dashboard/jobs/${job.id}`} className="btn-primary text-xs px-5 py-2 min-h-0">
             View Role
           </Link>
         </div>

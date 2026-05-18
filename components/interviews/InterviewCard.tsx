@@ -70,14 +70,14 @@ export default function InterviewCard({
           </p>
         </div>
 
-        <div className="flex flex-row justify-between items-end">
-          {/* Tech icons */}
-          <div className="flex flex-row">
-            {techIcons.slice(0, 3).map(({ tech, url }, idx) => (
+        <div className="flex flex-row justify-between items-center">
+          {/* Tech icons stack */}
+          <div className="flex flex-row mr-2">
+            {techIcons.slice(0, 4).map(({ tech, url }, idx) => (
               <div
                 key={tech}
                 className={cn(
-                  "relative group bg-dark-300 rounded-full p-2 flex-center",
+                  "relative group bg-white/10 rounded-full p-2 flex-center border border-white/5",
                   idx >= 1 && "-ml-3"
                 )}
               >
@@ -93,7 +93,7 @@ export default function InterviewCard({
                 ? `/dashboard/interviews/feedback/${interviewId}`
                 : `/dashboard/interviews/session/${interviewId}`
             }
-            className="btn-primary text-xs px-4"
+            className="btn-primary text-xs px-5 py-2 min-h-0"
           >
             {feedback ? "Check Feedback" : "Start"}
           </Link>
