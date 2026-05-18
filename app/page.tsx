@@ -157,6 +157,45 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Testimonials Section */}
+      <section className="main-section py-24 w-full">
+        <div className="max-w-5xl w-full mx-auto text-center">
+          <h2 className="text-3xl font-bold mb-12 text-white">Success <span className="text-gradient">Stories</span></h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {[
+              {
+                quote: "CV2Hire helped me identify critical gaps in my resume. I landed a Senior Dev role at Spotify in 3 weeks!",
+                author: "Sarah J.",
+                role: "Senior Software Engineer",
+                initial: "S"
+              },
+              {
+                quote: "The mock interview AI is incredibly realistic. It's like talking to a real technical recruiter, but with instant feedback.",
+                author: "Michael R.",
+                role: "Product Manager",
+                initial: "M"
+              }
+            ].map((t, i) => (
+              <div key={i} className="card p-8 text-left relative overflow-hidden">
+                <div className="absolute top-0 right-0 p-4 opacity-10">
+                  <Zap className="size-12 text-primary-200" />
+                </div>
+                <p className="text-lg italic text-light-100 mb-8 font-medium relative z-10">"{t.quote}"</p>
+                <div className="flex items-center gap-3 relative z-10">
+                  <div className="size-10 rounded-full bg-primary-200/20 flex-center text-primary-200 font-bold border border-primary-200/20">
+                    {t.initial}
+                  </div>
+                  <div>
+                    <p className="font-bold text-white text-sm">{t.author}</p>
+                    <p className="text-xs text-light-400">{t.role}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section className="main-section py-24 pb-40">
         <div className="card-cta w-full max-w-4xl flex flex-col md:flex-row items-center gap-8 px-12 py-12 rounded-3xl relative overflow-hidden">
