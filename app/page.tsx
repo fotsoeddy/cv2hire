@@ -1,34 +1,8 @@
 import Link from "next/link";
 import Image from "next/image";
 import Navbar from "@/components/layout/Navbar";
-import { FileText, Mic, BarChart3, Zap, CheckCircle, ArrowRight, Briefcase } from "lucide-react";
-
-const features = [
-  {
-    icon: FileText,
-    title: "AI CV Analysis",
-    description:
-      "Upload your CV and get instant ATS scoring, content feedback, and actionable improvement tips powered by AI.",
-  },
-  {
-    icon: Mic,
-    title: "Voice Mock Interviews",
-    description:
-      "Practice real-time voice interviews with an AI interviewer tailored to your target role and tech stack.",
-  },
-  {
-    icon: BarChart3,
-    title: "Performance Tracking",
-    description:
-      "Track your progress across multiple CV versions and interview attempts to measure improvement.",
-  },
-  {
-    icon: Zap,
-    title: "Actionable Feedback",
-    description:
-      "Get detailed category breakdowns, strengths, areas for improvement, and expert-level recommendations.",
-  },
-];
+import Section from "@/components/ui/Section";
+import { FileText, Mic, BarChart3, Zap, CheckCircle, ArrowRight, Briefcase, Check, Sparkles, Target, Award } from "lucide-react";
 
 const steps = [
   { step: "01", title: "Upload Your CV", desc: "Drop your PDF resume and optionally add a job description to compare against." },
@@ -48,26 +22,26 @@ export default function LandingPage() {
           <div className="px-4 py-1.5 rounded-full bg-primary-200/10 text-primary-200 text-sm font-medium w-fit">
             AI-Powered Job Readiness
           </div>
-          <h1 className="text-5xl md:text-6xl font-bold tracking-tight">
+          <h1 className="text-5xl md:text-6xl font-bold tracking-tight mt-6">
             From <span className="text-gradient">Resume</span> to{" "}
             <span className="text-gradient">Hired</span>
           </h1>
-          <p className="text-lg text-light-100 max-w-2xl">
-            Analyze your CV, practice mock interviews, and get AI-powered feedback —
+          <p className="text-lg text-light-100 max-w-2xl mt-6">
+            Analyze your CV, generate motivation letters, practice mock interviews, and get AI-powered feedback —
             all in one platform. Land your dream job with confidence.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 mt-6 justify-center">
+          <div className="flex flex-col sm:flex-row gap-4 mt-8 justify-center">
             <Link href="/auth/sign-up" className="btn-primary px-8">
               Get Started Free
             </Link>
-            <Link href="#how-it-works" className="btn-ghost">
+            <Link href="#features" className="btn-ghost">
               Learn More
             </Link>
           </div>
         </div>
 
         {/* Floating stats */}
-        <div className="grid grid-cols-3 gap-8 mt-16 max-w-2xl">
+        <div className="grid grid-cols-3 gap-8 mt-16 max-w-2xl mx-auto">
           {[
             { value: "10K+", label: "CVs Analyzed" },
             { value: "5K+", label: "Mock Interviews" },
@@ -81,160 +55,235 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Features */}
-      <section id="features" className="main-section py-20">
-        <h2 className="text-center mb-4">Everything You Need</h2>
-        <p className="text-center text-light-400 mb-12 max-w-xl">
-          One platform combining CV analysis and interview preparation with powerful AI.
+      {/* New Feature Sections */}
+      <div className="border-t border-white/5 bg-black/20">
+        <Section
+          title={<>Smart <span className="text-gradient">CV Generation</span> & ATS Scoring</>}
+          description="Don't let the bots reject you. Our AI analyzes your CV against real job descriptions, gives you an ATS score, and helps you rewrite bullet points to highlight your true impact."
+          imageSrc="/images/resume-scan.gif"
+          imageAlt="CV Generation and ATS Score"
+          features={[
+            "Instant ATS compatibility scoring",
+            "Action verb and keyword suggestions",
+            "Tailor your CV to specific job descriptions"
+          ]}
+          ctaText="Explore CV Builder"
+          ctaLink="/cv-builder"
+          reverse={false}
+        />
+
+        <Section
+          title={<>Generate Winning <span className="text-gradient">Motivation Letters</span></>}
+          description="Struggling to write a cover letter? Let our AI generate a personalized, compelling motivation letter that perfectly bridges your experience with the company's needs."
+          imageSrc="/images/resume_02.png"
+          imageAlt="Motivation Letter Generation"
+          features={[
+            "Personalized tone and style matching",
+            "Highlights your most relevant achievements",
+            "Saves hours of writing block"
+          ]}
+          ctaText="Try it out"
+          ctaLink="/auth/sign-up"
+          reverse={true}
+        />
+
+        <Section
+          title={<>Real-time <span className="text-gradient">Voice Agent</span> Interviews</>}
+          description="Nervous about the phone screen? Practice with our real-time Voice AI. It asks technical and behavioral questions, listens to your answers, and provides immediate feedback."
+          imageSrc="/images/resume_03.png"
+          imageAlt="Voice Mock Interviews"
+          features={[
+            "Conversational AI interviewer",
+            "Role-specific technical questions",
+            "Post-interview feedback report"
+          ]}
+          ctaText="Discover Voice Agent"
+          ctaLink="/voice-agent"
+          reverse={false}
+        />
+
+        <Section
+          title={<>AI-Curated <span className="text-gradient">Personal Courses</span></>}
+          description="Identify your skill gaps and level up. Based on your target role and interview performance, our AI curates personalized learning paths and course recommendations to make you the perfect candidate."
+          imageSrc="/images/personal_course.png"
+          imageAlt="Personalized AI Courses"
+          features={[
+            "Skill gap identification",
+            "Tailored learning roadmaps",
+            "Track your upskilling progress"
+          ]}
+          ctaText="Start Learning"
+          ctaLink="/auth/sign-up"
+          reverse={true}
+        />
+      </div>
+
+      {/* Bento Box Features */}
+      <section id="features" className="main-section py-24 border-t border-white/5">
+        <h2 className="text-center mb-4 text-4xl font-bold">Everything You Need</h2>
+        <p className="text-center text-light-400 mb-16 max-w-xl mx-auto text-lg">
+          A complete ecosystem designed to accelerate your job search and boost your confidence.
         </p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-4xl w-full">
-          {features.map((f) => (
-            <div key={f.title} className="card p-5 rounded-2xl flex flex-col gap-3">
-              <div className="size-10 rounded-xl primary-gradient flex-center">
-                <f.icon className="size-5 text-white" />
-              </div>
-              <h3 className="text-base font-semibold text-white">{f.title}</h3>
-              <p className="text-xs text-light-400 leading-relaxed">{f.description}</p>
+        
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto w-full">
+          {/* Large Card 1 */}
+          <div className="md:col-span-2 card p-8 md:p-12 rounded-3xl border border-white/5 hover:border-primary-200/30 transition-all duration-300 group overflow-hidden relative">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-primary-200/10 blur-3xl rounded-full -translate-y-1/2 translate-x-1/2 group-hover:bg-primary-200/20 transition-all" />
+            <div className="size-14 rounded-2xl primary-gradient flex-center mb-6 relative z-10">
+              <Sparkles className="size-6 text-white" />
             </div>
-          ))}
-        </div>
-      </section>
-
-      {/* How it works */}
-      <section className="main-section py-20">
-        <h2 className="text-center mb-4">How It Works</h2>
-        <p className="text-center text-light-400 mb-12 max-w-xl">
-          Four simple steps to transform your job search.
-        </p>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl w-full">
-          {steps.map((s) => (
-            <div key={s.step} className="card p-6 rounded-2xl flex flex-col gap-3 relative">
-              <span className="text-5xl font-bold text-primary-200/10">{s.step}</span>
-              <h3 className="text-base font-semibold text-white">{s.title}</h3>
-              <p className="text-sm text-light-400">{s.desc}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Featured Roles Section */}
-      <section className="main-section py-24 bg-white/[0.02] border-y border-white/5 w-full">
-        <div className="max-w-5xl w-full mx-auto">
-          <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
-            <div className="text-center md:text-left">
-              <h2 className="text-3xl font-bold">Recommended <span className="text-gradient">Roles</span></h2>
-              <p className="text-light-400 mt-2">Practice for the most in-demand positions in tech</p>
-            </div>
-            <Link href="/auth/sign-up" className="text-primary-200 hover:underline text-sm font-medium">
-              View all roles →
-            </Link>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[
-              {
-                role: "Frontend Developer",
-                company: "Google",
-                logo: "https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_\"G\"_Logo.svg",
-                desc: "Work on world-class user interfaces using React and Next.js.",
-                tech: ["React", "Next.js", "Tailwind"]
-              },
-              {
-                role: "Product Manager",
-                company: "Meta",
-                logo: "https://upload.wikimedia.org/wikipedia/commons/7/7b/Meta_Platforms_Inc._logo.svg",
-                desc: "Drive product strategy and execution for global social platforms.",
-                tech: ["Agile", "Jira", "Strategy"]
-              },
-              {
-                role: "Backend Engineer",
-                company: "Spotify",
-                logo: "https://upload.wikimedia.org/wikipedia/commons/1/19/Spotify_logo_without_text.svg",
-                desc: "Scale high-performance APIs for millions of music lovers.",
-                tech: ["Node.js", "Python", "Redis"]
-              },
-            ].map((job, i) => (
-              <div key={i} className="card p-6 border border-white/5 hover:border-primary-200/30 transition-all flex flex-col">
-                <div className="flex justify-between items-start mb-4">
-                  <div className="size-10 rounded-lg bg-white/5 p-2 flex-center overflow-hidden">
-                    <img src={job.logo} alt={job.company} className="size-full object-contain" />
-                  </div>
-                  <div className="flex gap-1">
-                    {job.tech.map((t) => (
-                      <span key={t} className="px-1.5 py-0.5 rounded-md text-[9px] font-bold bg-white/5 text-light-400">
-                        {t}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-                <h3 className="text-lg font-bold mb-1 text-white">{job.role}</h3>
-                <p className="text-xs text-primary-200 mb-3 font-medium">{job.company}</p>
-                <p className="text-xs text-light-400 mb-6 leading-relaxed flex-1">
-                  {job.desc}
-                </p>
-                <Link href="/auth/sign-up" className="btn-secondary w-full text-xs py-2 min-h-0">
-                  Prepare for this role
-                </Link>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials Section */}
-      <section className="main-section py-24 w-full">
-        <div className="max-w-5xl w-full mx-auto text-center">
-          <h2 className="text-3xl font-bold mb-12 text-white">Success <span className="text-gradient">Stories</span></h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {[
-              {
-                quote: "CV2Hire helped me identify critical gaps in my resume. I landed a Senior Dev role at Spotify in 3 weeks!",
-                author: "Sarah J.",
-                role: "Senior Software Engineer",
-                initial: "S"
-              },
-              {
-                quote: "The mock interview AI is incredibly realistic. It's like talking to a real technical recruiter, but with instant feedback.",
-                author: "Michael R.",
-                role: "Product Manager",
-                initial: "M"
-              }
-            ].map((t, i) => (
-              <div key={i} className="card p-8 text-left relative overflow-hidden">
-                <p className="text-lg italic text-light-100 mb-8 font-medium relative z-10">"{t.quote}"</p>
-                <div className="flex items-center gap-3 relative z-10">
-                  <div className="size-10 rounded-full bg-primary-200/20 flex-center text-primary-200 font-bold border border-primary-200/20">
-                    {t.initial}
-                  </div>
-                  <div>
-                    <p className="font-bold text-white text-sm">{t.author}</p>
-                    <p className="text-xs text-light-400">{t.role}</p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="w-full mt-20">
-        <div className="card-cta flex flex-col md:flex-row items-center justify-between gap-8 md:gap-4 p-8 md:p-12 text-center md:text-left">
-          <div>
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-              Ready to land your <span className="text-primary-200">Dream Job?</span>
-            </h2>
-            <p className="text-light-400 text-lg max-w-xl mx-auto md:mx-0">
-              Join 10,000+ professionals using CV2Hire to prepare for their next career move.
+            <h3 className="text-2xl font-bold text-white mb-4 relative z-10">Actionable AI Feedback</h3>
+            <p className="text-light-400 leading-relaxed max-w-md relative z-10">
+              Stop guessing why you didn't get the interview. Our AI breaks down your CV and interview performance into actionable, step-by-step recommendations.
             </p>
           </div>
-          <Link href="/dashboard" className="btn-primary text-base px-8 py-3 w-full md:w-auto min-h-0">
-            Start Now &rarr;
-          </Link>
+
+          {/* Small Card 1 */}
+          <div className="card p-8 rounded-3xl border border-white/5 hover:border-primary-200/30 transition-all duration-300 group overflow-hidden relative">
+            <div className="size-12 rounded-xl bg-white/5 flex-center mb-6 relative z-10 group-hover:scale-110 transition-transform">
+              <Target className="size-6 text-primary-200" />
+            </div>
+            <h3 className="text-xl font-bold text-white mb-3 relative z-10">Targeted Roles</h3>
+            <p className="text-sm text-light-400 leading-relaxed relative z-10">
+              Tailor every simulation and analysis to the exact role you are applying for.
+            </p>
+          </div>
+
+          {/* Small Card 2 */}
+          <div className="card p-8 rounded-3xl border border-white/5 hover:border-primary-200/30 transition-all duration-300 group overflow-hidden relative">
+            <div className="size-12 rounded-xl bg-white/5 flex-center mb-6 relative z-10 group-hover:scale-110 transition-transform">
+              <BarChart3 className="size-6 text-primary-200" />
+            </div>
+            <h3 className="text-xl font-bold text-white mb-3 relative z-10">Performance Tracking</h3>
+            <p className="text-sm text-light-400 leading-relaxed relative z-10">
+              Visualize your improvement over time with detailed charts and historical scores.
+            </p>
+          </div>
+
+          {/* Large Card 2 */}
+          <div className="md:col-span-2 card p-8 md:p-12 rounded-3xl border border-white/5 hover:border-primary-200/30 transition-all duration-300 group overflow-hidden relative">
+            <div className="absolute bottom-0 left-0 w-64 h-64 bg-primary-200/10 blur-3xl rounded-full translate-y-1/2 -translate-x-1/2 group-hover:bg-primary-200/20 transition-all" />
+            <div className="size-14 rounded-2xl primary-gradient flex-center mb-6 relative z-10">
+              <Award className="size-6 text-white" />
+            </div>
+            <h3 className="text-2xl font-bold text-white mb-4 relative z-10">Expert-Level Accuracy</h3>
+            <p className="text-light-400 leading-relaxed max-w-md relative z-10">
+              Our models are trained on thousands of successful resumes and technical interviews from top-tier tech companies.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Pricing Overview */}
+      <section className="main-section py-24 bg-white/[0.02] border-y border-white/5 w-full">
+        <div className="max-w-6xl w-full mx-auto text-center">
+          <h2 className="text-4xl font-bold mb-4">Simple, transparent <span className="text-gradient">pricing</span></h2>
+          <p className="text-light-400 mb-16 max-w-xl mx-auto text-lg">Invest in your career today. Choose the plan that best fits your job search needs.</p>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto text-left">
+            
+            {/* Free Plan */}
+            <div className="card p-8 rounded-3xl border border-white/10 flex flex-col relative hover:border-white/20 transition-colors">
+              <h3 className="text-xl font-bold text-white mb-2">Free</h3>
+              <div className="flex items-baseline gap-2 mb-6">
+                <span className="text-4xl font-bold text-white">$0</span>
+                <span className="text-light-400">/ forever</span>
+              </div>
+              <p className="text-sm text-light-400 border-b border-white/10 pb-6 mb-6">Test the waters with basic features.</p>
+              <div className="flex-1 flex flex-col gap-4 mb-8">
+                <div className="flex gap-3"><Check className="size-5 text-light-400 shrink-0" /><span className="text-light-100 text-sm">1 CV ATS Scan</span></div>
+                <div className="flex gap-3"><Check className="size-5 text-light-400 shrink-0" /><span className="text-light-100 text-sm">Basic Motivation Letter</span></div>
+              </div>
+              <Link href="/auth/sign-up" className="btn-ghost w-full justify-center">Sign Up Free</Link>
+            </div>
+
+            {/* Starter Plan */}
+            <div className="card p-8 rounded-3xl border border-primary-200/50 bg-primary-200/5 flex flex-col relative transform md:-translate-y-4 shadow-2xl shadow-primary-200/10">
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-primary-200 text-dark-100 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">Popular</div>
+              <h3 className="text-xl font-bold text-primary-200 mb-2">Starter</h3>
+              <div className="flex items-baseline gap-2 mb-6">
+                <span className="text-4xl font-bold text-white">$9</span>
+                <span className="text-light-400">/ month</span>
+              </div>
+              <p className="text-sm text-light-400 border-b border-white/10 pb-6 mb-6">Perfect for active job seekers.</p>
+              <div className="flex-1 flex flex-col gap-4 mb-8">
+                <div className="flex gap-3"><Check className="size-5 text-primary-200 shrink-0" /><span className="text-white text-sm">10 CV ATS Scans</span></div>
+                <div className="flex gap-3"><Check className="size-5 text-primary-200 shrink-0" /><span className="text-white text-sm">5 Motivation Letters</span></div>
+                <div className="flex gap-3"><Check className="size-5 text-primary-200 shrink-0" /><span className="text-white text-sm">3 Voice Mock Interviews</span></div>
+                <div className="flex gap-3"><Check className="size-5 text-primary-200 shrink-0" /><span className="text-white text-sm">Actionable Feedback</span></div>
+              </div>
+              <Link href="/pricing" className="btn-primary w-full justify-center">Get Starter</Link>
+            </div>
+
+            {/* Pro Plan */}
+            <div className="card p-8 rounded-3xl border border-white/10 flex flex-col relative hover:border-white/20 transition-colors">
+              <h3 className="text-xl font-bold text-white mb-2">Pro</h3>
+              <div className="flex items-baseline gap-2 mb-6">
+                <span className="text-4xl font-bold text-white">$19</span>
+                <span className="text-light-400">/ month</span>
+              </div>
+              <p className="text-sm text-light-400 border-b border-white/10 pb-6 mb-6">Unlimited access to land your dream job.</p>
+              <div className="flex-1 flex flex-col gap-4 mb-8">
+                <div className="flex gap-3"><Check className="size-5 text-primary-200 shrink-0" /><span className="text-white text-sm">Unlimited CV Generations</span></div>
+                <div className="flex gap-3"><Check className="size-5 text-primary-200 shrink-0" /><span className="text-white text-sm">Unlimited Motivation Letters</span></div>
+                <div className="flex gap-3"><Check className="size-5 text-primary-200 shrink-0" /><span className="text-white text-sm">Unlimited Voice Interviews</span></div>
+                <div className="flex gap-3"><Check className="size-5 text-primary-200 shrink-0" /><span className="text-white text-sm">Personalized Courses</span></div>
+              </div>
+              <Link href="/pricing" className="btn-ghost border-primary-200/50 text-primary-200 w-full justify-center hover:bg-primary-200/10">Get Pro</Link>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      {/* Success Metrics / Additional Section */}
+      <section className="main-section py-24 border-b border-white/5">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-3xl md:text-4xl font-bold mb-6">Trusted by job seekers worldwide</h2>
+          <p className="text-light-400 text-lg mb-12">Our platform is designed to give you the competitive edge in today's tough job market.</p>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            <div className="flex flex-col items-center">
+              <span className="text-4xl font-bold text-gradient mb-2">3x</span>
+              <span className="text-sm text-light-400">More Interviews</span>
+            </div>
+            <div className="flex flex-col items-center">
+              <span className="text-4xl font-bold text-gradient mb-2">95%</span>
+              <span className="text-sm text-light-400">ATS Pass Rate</span>
+            </div>
+            <div className="flex flex-col items-center">
+              <span className="text-4xl font-bold text-gradient mb-2">48h</span>
+              <span className="text-sm text-light-400">Avg. Time Saved</span>
+            </div>
+            <div className="flex flex-col items-center">
+              <span className="text-4xl font-bold text-gradient mb-2">24/7</span>
+              <span className="text-sm text-light-400">AI Support</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Massive CTA Section */}
+      <section className="w-full relative overflow-hidden py-32">
+        <div className="absolute inset-0 bg-primary-200/10 pointer-events-none" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-3xl aspect-square bg-primary-200/20 blur-[120px] rounded-full pointer-events-none" />
+        
+        <div className="max-w-4xl mx-auto relative z-10 text-center px-6">
+          <h2 className="text-5xl md:text-6xl font-bold text-white mb-6 leading-tight">
+            Ready to land your <br/><span className="text-primary-200">Dream Job?</span>
+          </h2>
+          <p className="text-light-100 text-xl max-w-2xl mx-auto mb-10">
+            Join thousands of professionals who have transformed their job search with CV2Hire's AI-powered platform.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link href="/auth/sign-up" className="btn-primary text-lg px-10 py-4 h-auto shadow-[0_0_40px_rgba(33,230,193,0.3)] hover:shadow-[0_0_60px_rgba(33,230,193,0.5)] transition-all">
+              Start Your Free Trial
+            </Link>
+          </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-border py-8 text-center">
+      <footer className="border-t border-white/5 py-8 text-center bg-black/40">
         <p className="text-sm text-light-400">
           © 2026 CV2Hire. All rights reserved.
         </p>
