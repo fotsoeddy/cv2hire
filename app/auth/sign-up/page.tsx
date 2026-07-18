@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { authApi, ApiRequestError, type ValidationError } from "@/lib/api-client";
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -14,24 +15,51 @@ export default function SignUpPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<ValidationError>({});
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!acceptedTerms) {
-      alert("Please accept the Terms of Service and Privacy Policy to continue.");
+      setError("Please accept the Terms of Service and Privacy Policy to continue.");
       return;
     }
     if (password !== confirmPassword) {
-      alert("Your passwords do not match. Please try again.");
+      setFieldErrors({ confirm_password: ["Your passwords do not match. Please try again."] });
       return;
     }
     
     setLoading(true);
-    // Placeholder: NO API CALL per user request
-    setTimeout(() => {
+    setError(null);
+    setFieldErrors({});
+
+    try {
+      await authApi.register({
+        email,
+        first_name: firstName,
+        last_name: lastName,
+        password,
+        password_confirm: confirmPassword,
+        accepted_terms_and_policy: acceptedTerms,
+      });
+
+      // Save email for verification page
+      sessionStorage.setItem("verify_email", email);
+      
       setLoading(false);
       router.push("/auth/verify-email");
-    }, 800);
+    } catch (err) {
+      setLoading(false);
+      if (err instanceof ApiRequestError) {
+        if (err.errors) {
+          setFieldErrors(err.errors);
+        } else {
+          setError(err.message);
+        }
+      } else {
+        setError("An unexpected error occurred. Please try again.");
+      }
+    }
   };
 
   return (
@@ -50,6 +78,12 @@ export default function SignUpPage() {
 
         <h3 className="text-center">Create your account</h3>
 
+        {error && (
+          <div className="p-3.5 bg-red-500/10 border border-red-500/20 text-red-500 text-sm rounded-xl text-center">
+            {error}
+          </div>
+        )}
+
         <form onSubmit={handleSignUp} className="w-full space-y-4 mt-2">
           <div className="flex gap-3">
             <div className="form-div flex-1">
@@ -62,6 +96,9 @@ export default function SignUpPage() {
                 onChange={(e) => setFirstName(e.target.value)}
                 required
               />
+              {fieldErrors.first_name && (
+                <p className="text-red-500 text-xs mt-1">{fieldErrors.first_name.join(" ")}</p>
+              )}
             </div>
             <div className="form-div flex-1">
               <label htmlFor="lastName">Last Name</label>
@@ -73,6 +110,9 @@ export default function SignUpPage() {
                 onChange={(e) => setLastName(e.target.value)}
                 required
               />
+              {fieldErrors.last_name && (
+                <p className="text-red-500 text-xs mt-1">{fieldErrors.last_name.join(" ")}</p>
+              )}
             </div>
           </div>
 
@@ -86,6 +126,9 @@ export default function SignUpPage() {
               onChange={(e) => setEmail(e.target.value)}
               required
             />
+            {fieldErrors.email && (
+              <p className="text-red-500 text-xs mt-1">{fieldErrors.email.join(" ")}</p>
+            )}
           </div>
 
           <div className="flex gap-3">
@@ -99,6 +142,9 @@ export default function SignUpPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
               />
+              {fieldErrors.password && (
+                <p className="text-red-500 text-xs mt-1">{fieldErrors.password.join(" ")}</p>
+              )}
             </div>
 
             <div className="form-div flex-1">
@@ -111,6 +157,12 @@ export default function SignUpPage() {
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
               />
+              {fieldErrors.password_confirm && (
+                <p className="text-red-500 text-xs mt-1">{fieldErrors.password_confirm.join(" ")}</p>
+              )}
+              {fieldErrors.confirm_password && (
+                <p className="text-red-500 text-xs mt-1">{fieldErrors.confirm_password.join(" ")}</p>
+              )}
             </div>
           </div>
 
@@ -126,6 +178,9 @@ export default function SignUpPage() {
               I accept the <span className="text-primary-200">Terms of Service</span> and <span className="text-primary-200">Privacy Policy</span>
             </label>
           </div>
+          {fieldErrors.accepted_terms_and_policy && (
+            <p className="text-red-500 text-xs mt-1">{fieldErrors.accepted_terms_and_policy.join(" ")}</p>
+          )}
 
           <button type="submit" className="auth-button mt-2" disabled={loading}>
             {loading ? "Signing Up..." : "Sign Up"}
@@ -158,3 +213,4 @@ export default function SignUpPage() {
     </div>
   );
 }
+

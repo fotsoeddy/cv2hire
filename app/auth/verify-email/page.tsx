@@ -1,14 +1,25 @@
 "use client";
 
-import Link from "next/link";
 import Image from "next/image";
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { authApi, ApiRequestError } from "@/lib/api-client";
 
 export default function VerifyEmailPage() {
   const router = useRouter();
+  const [email] = useState(() => {
+    if (typeof window !== "undefined") {
+      const stored = sessionStorage.getItem("verify_email") || "";
+      const search = new URLSearchParams(window.location.search).get("email") || "";
+      return stored || search;
+    }
+    return "";
+  });
   const [code, setCode] = useState(["", "", "", "", "", ""]);
   const [loading, setLoading] = useState(false);
+  const [resending, setResending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   const handleChange = (index: number, value: string) => {
@@ -32,17 +43,52 @@ export default function VerifyEmailPage() {
     }
   };
 
-  const handleVerify = (e: React.FormEvent) => {
+  const handleVerify = async (e: React.FormEvent) => {
     e.preventDefault();
     const fullCode = code.join("");
     if (fullCode.length < 6) return;
     
     setLoading(true);
-    // Placeholder: NO API CALL per user request
-    setTimeout(() => {
+    setError(null);
+    setSuccessMessage(null);
+
+    try {
+      await authApi.verifyEmail({ email, code: fullCode });
+      setSuccessMessage("Email verified successfully! Redirecting to sign in...");
+      setTimeout(() => {
+        router.push("/auth/sign-in");
+      }, 1500);
+    } catch (err) {
       setLoading(false);
-      router.push("/auth/sign-in");
-    }, 800);
+      if (err instanceof ApiRequestError) {
+        setError(err.message);
+      } else {
+        setError("Invalid code or connection issue.");
+      }
+    }
+  };
+
+  const handleResend = async () => {
+    if (!email) {
+      setError("No email specified. Please register first.");
+      return;
+    }
+    setResending(true);
+    setError(null);
+    setSuccessMessage(null);
+
+    try {
+      const response = await authApi.resendCode(email);
+      setSuccessMessage(response.message || "Verification code resent successfully.");
+      setResending(false);
+    } catch (err) {
+      setResending(false);
+      if (err instanceof ApiRequestError) {
+        setError(err.message);
+      } else {
+        setError("Failed to resend code. Please try again.");
+      }
+    }
   };
 
   return (
@@ -61,8 +107,20 @@ export default function VerifyEmailPage() {
 
         <h3 className="text-center">Verify your email</h3>
         <p className="text-sm text-light-400 text-center">
-          We&apos;ve sent a 6-digit code to your email. Enter it below to verify your account.
+          We&apos;ve sent a 6-digit code to <strong className="text-white">{email || "your email"}</strong>. Enter it below to verify your account.
         </p>
+
+        {error && (
+          <div className="p-3.5 bg-red-500/10 border border-red-500/20 text-red-500 text-sm rounded-xl text-center">
+            {error}
+          </div>
+        )}
+
+        {successMessage && (
+          <div className="p-3.5 bg-green-500/10 border border-green-500/20 text-green-500 text-sm rounded-xl text-center">
+            {successMessage}
+          </div>
+        )}
 
         <form onSubmit={handleVerify} className="w-full space-y-6 mt-2">
           <div className="flex justify-between gap-2">
@@ -94,11 +152,17 @@ export default function VerifyEmailPage() {
 
         <p className="text-center text-sm">
           Didn&apos;t receive the code?{" "}
-          <button type="button" className="font-bold text-primary-200 hover:underline">
-            Resend
+          <button 
+            type="button" 
+            onClick={handleResend}
+            disabled={resending || !email}
+            className="font-bold text-primary-200 hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {resending ? "Resending..." : "Resend"}
           </button>
         </p>
       </div>
     </div>
   );
 }
+
