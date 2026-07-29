@@ -116,10 +116,10 @@
     @apply text-light-100 text-sm;
   }
   input {
-    @apply w-full bg-dark-200 rounded-full min-h-12 px-5 text-white placeholder:text-light-400 focus:outline-none;
+    @apply w-full bg-dark-200 rounded-full min-h-12 px-5 text-white placeholder:text-light-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-200/60 transition-shadow;
   }
   textarea {
-    @apply w-full bg-dark-200 rounded-2xl min-h-24 px-5 py-3 text-white placeholder:text-light-400 focus:outline-none;
+    @apply w-full bg-dark-200 rounded-2xl min-h-24 px-5 py-3 text-white placeholder:text-light-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-200/60 transition-shadow;
   }
 }
 

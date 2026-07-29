@@ -24,7 +24,7 @@ const steps: Step[] = [
   {
     icon: UploadCloud,
     title: "Upload Your CV",
-    desc: "Drop your PDF resume and optionally add a job description to compare against.",
+    desc: "Drop your PDF resume and optionally add a job description.",
     color: "text-primary-200",
     ring: "border-primary-200/30",
     hex: "#cac5fe",
@@ -32,7 +32,7 @@ const steps: Step[] = [
   {
     icon: ScanSearch,
     title: "AI Analyzes Your Resume",
-    desc: "Our model scans structure, tone, and keywords to surface an ATS-ready score.",
+    desc: "We scan structure, tone, and keywords for an ATS-ready score.",
     color: "text-resume-blue",
     ring: "border-resume-blue/30",
     hex: "#8E97C5",
@@ -40,7 +40,7 @@ const steps: Step[] = [
   {
     icon: Mic,
     title: "Start Your Mock Interview",
-    desc: "Select a role and speak live with an AI interviewer tailored to your target job.",
+    desc: "Speak live with an AI interviewer tailored to your target job.",
     color: "text-success-100",
     ring: "border-success-100/30",
     hex: "#49de50",
@@ -48,7 +48,7 @@ const steps: Step[] = [
   {
     icon: ClipboardCheck,
     title: "Receive Detailed Feedback",
-    desc: "Get a full breakdown of your answers, tone, and technical depth after every session.",
+    desc: "Get a breakdown of your answers, tone, and technical depth.",
     color: "text-resume-pink",
     ring: "border-resume-pink/30",
     hex: "#AB8C95",
@@ -56,102 +56,136 @@ const steps: Step[] = [
   {
     icon: TrendingUp,
     title: "Improve and Track Progress",
-    desc: "Apply the feedback, re-run analyses, and watch your readiness score climb.",
+    desc: "Re-run analyses and watch your readiness score climb.",
     color: "text-primary-100",
     ring: "border-primary-100/30",
     hex: "#dddfff",
   },
 ];
 
-function StepCopy({ step, index }: { step: Step; index: number }) {
-  return (
-    <div className="space-y-1.5">
-      <span className={cn("text-[11px] font-bold tracking-widest", step.color)}>
-        STEP {String(index + 1).padStart(2, "0")}
-      </span>
-      <h3 className="text-base font-semibold text-white">{step.title}</h3>
-      <p className="text-sm text-light-400 leading-relaxed">{step.desc}</p>
-    </div>
-  );
+// A gentle left/right wiggle applied to the icon only — the text column
+// underneath stays put so copy length never has to fight the curve.
+const NODE_OFFSET = [0, 28, 0, -28, 0];
+
+function buildSmoothPath(points: { x: number; y: number }[]) {
+  if (points.length < 2) return "";
+  let d = `M${points[0].x},${points[0].y}`;
+  for (let i = 1; i < points.length; i++) {
+    const p0 = points[i - 1];
+    const p1 = points[i];
+    const midY = (p0.y + p1.y) / 2;
+    // Horizontal tangent at every node keeps the curve a smooth wave
+    // instead of a series of visible kinks.
+    d += ` C${p0.x},${midY} ${p1.x},${midY} ${p1.x},${p1.y}`;
+  }
+  return d;
 }
 
 export function HowItWorks() {
-  const containerRef = useRef<HTMLDivElement>(null);
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const svgRef = useRef<SVGSVGElement>(null);
   const pathRef = useRef<SVGPathElement>(null);
   const dotRef = useRef<HTMLDivElement>(null);
+  const nodeRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   useGSAP(
     () => {
-      if (!pathRef.current) return;
+      const section = sectionRef.current;
+      const svg = svgRef.current;
+      const path = pathRef.current;
+      if (!section || !svg || !path) return;
 
       const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      let ctx: ReturnType<typeof gsap.context> | undefined;
 
-      if (prefersReducedMotion) {
-        gsap.set(pathRef.current, { drawSVG: "100%" });
-        gsap.set(".how-it-works-copy", { opacity: 1, x: 0, y: 0 });
-        gsap.set(".how-it-works-node", { opacity: 1, scale: 1 });
-        if (dotRef.current) gsap.set(dotRef.current, { opacity: 0 });
-        return;
-      }
+      const build = () => {
+        ctx?.revert();
 
-      gsap.set(pathRef.current, { drawSVG: "0%" });
+        const containerRect = section.getBoundingClientRect();
+        const points = nodeRefs.current
+          .filter((el): el is HTMLDivElement => !!el)
+          .map((el) => {
+            const r = el.getBoundingClientRect();
+            return {
+              x: r.left + r.width / 2 - containerRect.left,
+              y: r.top + r.height / 2 - containerRect.top,
+            };
+          });
 
-      const scrollRange = {
-        trigger: containerRef.current,
-        start: "top 70%",
-        end: "bottom 65%",
-        scrub: 0.6,
+        if (points.length < 2) return;
+
+        svg.setAttribute("viewBox", `0 0 ${containerRect.width} ${containerRect.height}`);
+        path.setAttribute("d", buildSmoothPath(points));
+        if (dotRef.current) {
+          gsap.set(dotRef.current, { x: points[0].x, y: points[0].y });
+        }
+
+        ctx = gsap.context(() => {
+          if (prefersReducedMotion) {
+            gsap.set(path, { drawSVG: "100%" });
+            gsap.set(".how-it-works-copy, .how-it-works-node", { opacity: 1, y: 0, scale: 1 });
+            if (dotRef.current) gsap.set(dotRef.current, { opacity: 0 });
+            return;
+          }
+
+          gsap.set(path, { drawSVG: "0%" });
+
+          const scrollRange = {
+            trigger: section,
+            start: "top 75%",
+            end: "bottom 70%",
+            scrub: 0.6,
+          };
+
+          gsap.to(path, { drawSVG: "100%", ease: "none", scrollTrigger: scrollRange });
+
+          if (dotRef.current) {
+            gsap.to(dotRef.current, {
+              ease: "none",
+              scrollTrigger: scrollRange,
+              motionPath: { path, align: path, alignOrigin: [0.5, 0.5] },
+            });
+          }
+
+          gsap.utils.toArray<HTMLElement>(".how-it-works-step").forEach((item) => {
+            gsap.fromTo(
+              item.querySelector(".how-it-works-copy"),
+              { opacity: 0, y: 16 },
+              {
+                opacity: 1,
+                y: 0,
+                duration: 0.6,
+                ease: "power3.out",
+                scrollTrigger: { trigger: item, start: "top 85%" },
+              }
+            );
+            gsap.fromTo(
+              item.querySelector(".how-it-works-node"),
+              { opacity: 0, scale: 0.4 },
+              {
+                opacity: 1,
+                scale: 1,
+                duration: 0.6,
+                delay: 0.1,
+                ease: "back.out(1.6)",
+                scrollTrigger: { trigger: item, start: "top 85%" },
+              }
+            );
+          });
+        }, section);
       };
 
-      gsap.to(pathRef.current, {
-        drawSVG: "100%",
-        ease: "none",
-        scrollTrigger: scrollRange,
-      });
+      build();
 
-      if (dotRef.current) {
-        gsap.to(dotRef.current, {
-          ease: "none",
-          scrollTrigger: scrollRange,
-          motionPath: {
-            path: pathRef.current,
-            align: pathRef.current,
-            alignOrigin: [0.5, 0.5],
-          },
-        });
-      }
+      const resizeObserver = new ResizeObserver(() => build());
+      resizeObserver.observe(section);
 
-      gsap.utils.toArray<HTMLElement>(".how-it-works-step").forEach((item) => {
-        const isRight = item.dataset.side === "right";
-
-        gsap.fromTo(
-          item.querySelector(".how-it-works-copy"),
-          { opacity: 0, x: isRight ? 32 : -32, y: 12 },
-          {
-            opacity: 1,
-            x: 0,
-            y: 0,
-            duration: 0.7,
-            ease: "power3.out",
-            scrollTrigger: { trigger: item, start: "top 82%" },
-          }
-        );
-
-        gsap.fromTo(
-          item.querySelector(".how-it-works-node"),
-          { opacity: 0, scale: 0.4 },
-          {
-            opacity: 1,
-            scale: 1,
-            duration: 0.6,
-            delay: 0.1,
-            ease: "back.out(1.6)",
-            scrollTrigger: { trigger: item, start: "top 82%" },
-          }
-        );
-      });
+      return () => {
+        resizeObserver.disconnect();
+        ctx?.revert();
+      };
     },
-    { scope: containerRef }
+    { scope: sectionRef }
   );
 
   return (
@@ -163,13 +197,8 @@ export function HowItWorks() {
         </p>
       </div>
 
-      <div ref={containerRef} className="relative w-full max-w-2xl mx-auto">
-        <svg
-          aria-hidden
-          className="block absolute left-1/2 -translate-x-1/2 top-7 bottom-7 w-3"
-          viewBox="0 0 10 100"
-          preserveAspectRatio="none"
-        >
+      <div ref={sectionRef} className="relative w-full max-w-sm mx-auto">
+        <svg ref={svgRef} aria-hidden className="absolute inset-0 w-full h-full overflow-visible">
           <defs>
             <linearGradient id="stepLineGradient" x1="0" y1="0" x2="0" y2="1">
               {steps.map((s, i) => (
@@ -179,59 +208,46 @@ export function HowItWorks() {
           </defs>
           <path
             ref={pathRef}
-            d="M5,0 L5,100"
             fill="none"
             stroke="url(#stepLineGradient)"
-            strokeWidth="1.5"
+            strokeWidth="2"
             strokeLinecap="round"
-            vectorEffect="non-scaling-stroke"
           />
         </svg>
 
         <div
           ref={dotRef}
           aria-hidden
-          className="block absolute left-1/2 top-7 -translate-x-1/2 -translate-y-1/2 size-2.5 rounded-full bg-white z-20 shadow-[0_0_12px_2px_rgba(255,255,255,0.55)]"
+          className="absolute left-0 top-0 -translate-x-1/2 -translate-y-1/2 size-2.5 rounded-full bg-white z-20 shadow-[0_0_12px_2px_rgba(255,255,255,0.55)]"
         />
 
-        <div className="flex flex-col gap-14 sm:gap-20">
-          {steps.map((s, i) => {
-            const isRight = i % 2 === 1;
-            return (
+        <div className="flex flex-col gap-10">
+          {steps.map((s, i) => (
+            <div
+              key={s.title}
+              className="how-it-works-step relative z-10 flex flex-col items-center text-center gap-4"
+            >
               <div
-                key={s.title}
-                data-side={isRight ? "right" : "left"}
-                className="how-it-works-step grid grid-cols-1 sm:grid-cols-[1fr_auto_1fr] items-center gap-4 sm:gap-8"
+                ref={(el) => {
+                  nodeRefs.current[i] = el;
+                }}
+                style={{ transform: `translateX(${NODE_OFFSET[i]}px)` }}
+                className={cn(
+                  "how-it-works-node size-12 rounded-full bg-dark-200 border-2 flex-center shrink-0",
+                  s.ring
+                )}
               >
-                <div
-                  className={cn(
-                    "how-it-works-copy text-center sm:text-right",
-                    isRight ? "order-3 sm:order-0" : "order-2 sm:order-0"
-                  )}
-                >
-                  {!isRight && <StepCopy step={s} index={i} />}
-                </div>
-
-                <div
-                  className={cn(
-                    "how-it-works-node relative z-10 size-14 rounded-full bg-dark-200 border-2 flex-center shrink-0 mx-auto order-1 sm:order-0",
-                    s.ring
-                  )}
-                >
-                  <s.icon className={cn("size-6", s.color)} />
-                </div>
-
-                <div
-                  className={cn(
-                    "how-it-works-copy text-center sm:text-left",
-                    isRight ? "order-2 sm:order-0" : "order-3 sm:order-0"
-                  )}
-                >
-                  {isRight && <StepCopy step={s} index={i} />}
-                </div>
+                <s.icon className={cn("size-5", s.color)} />
               </div>
-            );
-          })}
+              <div className="how-it-works-copy space-y-1.5 max-w-xs">
+                <span className={cn("text-[11px] font-bold tracking-widest", s.color)}>
+                  STEP {String(i + 1).padStart(2, "0")}
+                </span>
+                <h3 className="text-base font-semibold text-white">{s.title}</h3>
+                <p className="text-sm text-light-400 leading-relaxed">{s.desc}</p>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </section>

@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { Reveal } from "@/components/ui/Reveal";
+import { CountUp } from "@/components/marketing/CountUp";
 
 const stats = [
-  { value: "10K+", label: "CVs Analyzed" },
-  { value: "5K+", label: "Mock Interviews" },
-  { value: "92%", label: "Improvement Rate" },
+  { target: 10, suffix: "K+", label: "CVs Analyzed" },
+  { target: 5, suffix: "K+", label: "Mock Interviews" },
+  { target: 92, suffix: "%", label: "Improvement Rate" },
 ];
 
 export function Hero() {
@@ -51,7 +52,9 @@ export function Hero() {
       >
         {stats.map((stat) => (
           <div key={stat.label} className="text-center px-8 first:pl-0 last:pr-0">
-            <p className="text-3xl font-bold text-gradient tabular-nums">{stat.value}</p>
+            <p className="text-3xl font-bold text-gradient tabular-nums">
+              <CountUp target={stat.target} suffix={stat.suffix} />
+            </p>
             <p className="text-sm text-light-400 mt-1">{stat.label}</p>
           </div>
         ))}

@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { authApi, ApiRequestError, type ValidationError } from "@/lib/api-client";
+import { PasswordField } from "@/components/ui/PasswordField";
 
 export default function SignInPage() {
   const router = useRouter();
@@ -22,11 +23,11 @@ export default function SignInPage() {
 
     try {
       const response = await authApi.login({ email, password });
-      
+
       // Save tokens
       localStorage.setItem("authToken", response.access);
       localStorage.setItem("refreshToken", response.refresh);
-      
+
       // Redirect to dashboard
       router.push("/dashboard");
     } catch (err) {
@@ -51,20 +52,22 @@ export default function SignInPage() {
   };
 
   return (
-    <div className="w-full max-w-[520px] card-border">
-      <div className="flex flex-col gap-6 card py-10 px-6 sm:py-14 sm:px-10">
-        <div className="flex justify-center mb-4">
+    <div className="w-full max-w-110 card-border">
+      <div className="flex flex-col gap-6 card py-8 px-6 sm:py-12 sm:px-10">
+        <div className="flex flex-col items-center gap-2 mb-2">
           <Image
             src="/logo.png"
             alt="CV2Hire Logo"
-            width={100}
-            height={32}
+            width={44}
+            height={44}
             className="object-contain"
             priority
           />
+          <h3 className="text-center">Welcome back</h3>
+          <p className="text-sm text-light-400 text-center">
+            Sign in to continue your job search prep.
+          </p>
         </div>
-
-        <h3 className="text-center">Welcome back</h3>
 
         {error && (
           <div className="p-3.5 bg-red-500/10 border border-red-500/20 text-red-500 text-sm rounded-xl text-center">
@@ -72,7 +75,7 @@ export default function SignInPage() {
           </div>
         )}
 
-        <form onSubmit={handleSignIn} className="w-full space-y-5 mt-2">
+        <form onSubmit={handleSignIn} className="w-full space-y-5">
           <div className="form-div">
             <label htmlFor="email">Email</label>
             <input
@@ -81,6 +84,7 @@ export default function SignInPage() {
               placeholder="you@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              autoComplete="email"
               required
             />
             {fieldErrors.email && (
@@ -88,22 +92,16 @@ export default function SignInPage() {
             )}
           </div>
 
-          <div className="form-div">
-            <label htmlFor="password">Password</label>
-            <input
-              id="password"
-              type="password"
-              placeholder="Enter your password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-            {fieldErrors.password && (
-              <p className="text-red-500 text-xs mt-1">{fieldErrors.password.join(" ")}</p>
-            )}
-          </div>
+          <PasswordField
+            id="password"
+            label="Password"
+            placeholder="Enter your password"
+            value={password}
+            onChange={setPassword}
+            error={fieldErrors.password?.join(" ")}
+          />
 
-          <div className="text-right">
+          <div className="text-right -mt-2">
             <Link href="/auth/forgot-password" className="text-sm text-primary-200 hover:underline">
               Forgot password?
             </Link>
@@ -124,4 +122,3 @@ export default function SignInPage() {
     </div>
   );
 }
-
