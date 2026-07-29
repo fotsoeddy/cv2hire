@@ -135,7 +135,7 @@ export default function SignInPage() {
           <div className="flex-1 h-px bg-white/10" />
         </div>
 
-        <GoogleSignInButton onCredential={handleGoogleCredential} />
+        <GoogleSignInButton onCredential={handleGoogleCredential} loading={googleLoading} disabled={loading} />
 
         <p className="text-center text-sm">
           Don&apos;t have an account?{" "}
