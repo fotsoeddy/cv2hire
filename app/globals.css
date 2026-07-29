@@ -688,22 +688,6 @@
   }
 }
 
-/* --- Step connector (How It Works) --- */
-.step-connector {
-  position: absolute;
-  top: 1.5rem;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(
-    to right,
-    transparent,
-    rgba(202, 197, 254, 0.25) 12%,
-    rgba(202, 197, 254, 0.25) 88%,
-    transparent
-  );
-}
-
 /* --- Testimonials marquee --- */
 .marquee-mask {
   mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
