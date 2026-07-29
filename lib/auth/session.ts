@@ -21,15 +21,29 @@ export function getRefreshToken(): string | null {
   return localStorage.getItem(REFRESH_TOKEN_KEY);
 }
 
+// Cache the parsed user keyed on the raw string so repeated calls with
+// unchanged localStorage content return the same object reference —
+// required for useSyncExternalStore (hooks/useSessionUser.ts), which
+// treats a new reference on every call as the store changing forever.
+let cachedRawUser: string | null = null;
+let cachedUser: SessionUser | null = null;
+
 export function getSessionUser(): SessionUser | null {
   if (!isBrowser()) return null;
   const raw = localStorage.getItem(USER_KEY);
-  if (!raw) return null;
-  try {
-    return JSON.parse(raw) as SessionUser;
-  } catch {
+  if (raw === cachedRawUser) return cachedUser;
+
+  cachedRawUser = raw;
+  if (!raw) {
+    cachedUser = null;
     return null;
   }
+  try {
+    cachedUser = JSON.parse(raw) as SessionUser;
+  } catch {
+    cachedUser = null;
+  }
+  return cachedUser;
 }
 
 export function setSession(params: {

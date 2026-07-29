@@ -22,6 +22,13 @@ interface StartParams {
   variableValues: Record<string, unknown>;
 }
 
+const MISSING_KEY_MESSAGE =
+  "Voice interviews aren't configured yet — NEXT_PUBLIC_VAPI_PUBLIC_KEY is missing.";
+
+function hasVapiPublicKey(): boolean {
+  return Boolean(process.env.NEXT_PUBLIC_VAPI_PUBLIC_KEY);
+}
+
 function describeStartError(err: unknown): string {
   if (err instanceof VapiConfigError) return err.message;
   if (err instanceof DOMException && err.name === "NotAllowedError") {
@@ -32,21 +39,29 @@ function describeStartError(err: unknown): string {
 }
 
 export function useVapiCall() {
-  const [status, setStatus] = useState<VapiCallStatus>("idle");
+  const [status, setStatus] = useState<VapiCallStatus>(() =>
+    hasVapiPublicKey() ? "idle" : "error"
+  );
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [transcript, setTranscript] = useState<TranscriptEntry[]>([]);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(() =>
+    hasVapiPublicKey() ? null : MISSING_KEY_MESSAGE
+  );
   const lastParamsRef = useRef<StartParams | null>(null);
 
+  // Mirrors `status` for the unmount-cleanup effect below, which needs the
+  // latest value without re-subscribing to Vapi events on every change.
+  const statusRef = useRef(status);
   useEffect(() => {
-    let vapi: ReturnType<typeof getVapiClient>;
-    try {
-      vapi = getVapiClient();
-    } catch (err) {
-      setError(describeStartError(err));
-      setStatus("error");
-      return;
-    }
+    statusRef.current = status;
+  });
+
+  // Subscribe to the Vapi client's events for this component's lifetime.
+  // If the public key is missing, `hasVapiPublicKey()` already gated the
+  // error into the initial state above — nothing to subscribe to here.
+  useEffect(() => {
+    if (!hasVapiPublicKey()) return;
+    const vapi = getVapiClient();
 
     const handleCallStart = () => setStatus("active");
     const handleCallEnd = () => setStatus("ended");
@@ -119,12 +134,11 @@ export function useVapiCall() {
   // navigates away from the interview page mid-call.
   useEffect(() => {
     return () => {
-      if (status === "active" || status === "connecting") {
+      if (statusRef.current === "active" || statusRef.current === "connecting") {
         stop();
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [stop]);
 
   return { status, isSpeaking, transcript, error, start, stop, retry };
 }
