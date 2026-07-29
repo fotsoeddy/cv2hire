@@ -1,18 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { CreditCard } from "lucide-react";
-import { clearSession, getSessionUser, type SessionUser } from "@/lib/auth/session";
+import { clearSession } from "@/lib/auth/session";
+import { useSessionUser } from "@/hooks/useSessionUser";
 import { ComingSoon } from "@/components/ui/ComingSoon";
 
 export default function SettingsPage() {
   const router = useRouter();
-  const [user, setUser] = useState<SessionUser | null>(null);
-
-  useEffect(() => {
-    setUser(getSessionUser());
-  }, []);
+  const user = useSessionUser();
 
   const handleLogout = () => {
     clearSession();

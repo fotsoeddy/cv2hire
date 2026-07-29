@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { LogOut, ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { clearSession, getSessionUser } from "@/lib/auth/session";
+import { clearSession } from "@/lib/auth/session";
+import { useSessionUser } from "@/hooks/useSessionUser";
 import { useSidebar } from "@/components/layout/SidebarContext";
 import { NAV_GROUPS, isNavItemActive } from "@/components/layout/nav-config";
 
@@ -14,11 +14,7 @@ export default function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const { collapsed, setCollapsed } = useSidebar();
-  const [email, setEmail] = useState<string | null>(null);
-
-  useEffect(() => {
-    setEmail(getSessionUser()?.email ?? null);
-  }, []);
+  const email = useSessionUser()?.email ?? null;
 
   const handleSignOut = () => {
     clearSession();

@@ -6,5 +6,5 @@ import { useApiResource } from "@/hooks/useApiResource";
 
 export function useJob(id: string | undefined) {
   const fetcher = useCallback(() => jobsApi.get(id as string), [id]);
-  return useApiResource(fetcher, [id], Boolean(id));
+  return useApiResource(fetcher, Boolean(id));
 }

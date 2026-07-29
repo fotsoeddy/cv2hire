@@ -1,16 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { User } from "lucide-react";
-import { getSessionUser, type SessionUser } from "@/lib/auth/session";
+import { useSessionUser } from "@/hooks/useSessionUser";
 import { ComingSoon } from "@/components/ui/ComingSoon";
 
 export default function ProfilePage() {
-  const [user, setUser] = useState<SessionUser | null>(null);
-
-  useEffect(() => {
-    setUser(getSessionUser());
-  }, []);
+  const user = useSessionUser();
 
   return (
     <div className="max-w-2xl space-y-8">

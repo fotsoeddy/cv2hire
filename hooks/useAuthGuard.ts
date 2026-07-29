@@ -1,8 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import { hasSession } from "@/lib/auth/session";
+
+function subscribe(): () => void {
+  return () => {};
+}
+
+function getServerSnapshot(): boolean {
+  return false;
+}
 
 /**
  * Client-side route guard. Tokens live in localStorage (not cookies), so
@@ -15,15 +23,13 @@ import { hasSession } from "@/lib/auth/session";
  */
 export function useAuthGuard() {
   const router = useRouter();
-  const [checked, setChecked] = useState(false);
+  const authorized = useSyncExternalStore(subscribe, hasSession, getServerSnapshot);
 
   useEffect(() => {
-    if (!hasSession()) {
+    if (!authorized) {
       router.replace("/auth/sign-in");
-      return;
     }
-    setChecked(true);
-  }, [router]);
+  }, [authorized, router]);
 
-  return checked;
+  return authorized;
 }

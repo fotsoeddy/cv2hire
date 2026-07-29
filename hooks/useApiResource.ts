@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { ApiRequestError } from "@/lib/api/client";
 
 interface ApiResourceState<T> {
@@ -10,30 +10,27 @@ interface ApiResourceState<T> {
 }
 
 /**
- * Shared fetch/loading/error state for a GET-style API call. `enabled`
- * lets callers defer the request (e.g. until a route param is available)
- * without violating the rules of hooks.
+ * Shared fetch/loading/error state for a GET-style API call. Callers pass
+ * an already-memoized `fetcher` (via `useCallback` with their own real
+ * deps, e.g. `[id]`) — that identity change is what triggers a re-fetch,
+ * so this hook doesn't need its own separate deps array.
+ *
+ * `enabled` lets callers defer the request (e.g. until a route param is
+ * available) without violating the rules of hooks.
  */
-export function useApiResource<T>(
-  fetcher: () => Promise<T>,
-  deps: unknown[],
-  enabled = true
-) {
+export function useApiResource<T>(fetcher: () => Promise<T>, enabled = true) {
   const [state, setState] = useState<ApiResourceState<T>>({
     data: null,
     loading: enabled,
     error: null,
   });
-  const fetcherRef = useRef(fetcher);
-  fetcherRef.current = fetcher;
 
   const load = useCallback(() => {
     if (!enabled) return;
     let cancelled = false;
     setState((prev) => ({ ...prev, loading: true, error: null }));
 
-    fetcherRef
-      .current()
+    fetcher()
       .then((data) => {
         if (!cancelled) setState({ data, loading: false, error: null });
       })
@@ -46,8 +43,7 @@ export function useApiResource<T>(
     return () => {
       cancelled = true;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [enabled, ...deps]);
+  }, [enabled, fetcher]);
 
   useEffect(() => load(), [load]);
 

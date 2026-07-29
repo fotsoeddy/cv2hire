@@ -110,14 +110,18 @@ export const mockCVAnalyses: CVAnalysis[] = [
 // ==========================================
 // CV History
 // ==========================================
-export const mockCVHistory: Partial<CVAnalysis>[] = [
+interface MockCVHistoryEntry extends Omit<Partial<CVAnalysis>, "feedback"> {
+  feedback?: { overallScore: number };
+}
+
+export const mockCVHistory: MockCVHistoryEntry[] = [
   {
     id: "cv-1",
     fileName: "Senior_Frontend_Dev_2026.pdf",
     jobTitle: "Senior Frontend Developer",
     companyName: "Google",
     createdAt: "2026-05-10T14:30:00Z",
-    feedback: { overallScore: 82 } as any,
+    feedback: { overallScore: 82 },
   },
   {
     id: "cv-2",
@@ -125,7 +129,7 @@ export const mockCVHistory: Partial<CVAnalysis>[] = [
     jobTitle: "Product Manager",
     companyName: "Meta",
     createdAt: "2026-05-12T09:15:00Z",
-    feedback: { overallScore: 74 } as any,
+    feedback: { overallScore: 74 },
   },
   {
     id: "cv-3",
@@ -133,6 +137,6 @@ export const mockCVHistory: Partial<CVAnalysis>[] = [
     jobTitle: "Backend Engineer",
     companyName: "Spotify",
     createdAt: "2026-05-15T16:45:00Z",
-    feedback: { overallScore: 88 } as any,
+    feedback: { overallScore: 88 },
   },
 ];

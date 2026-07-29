@@ -14,12 +14,14 @@ const POLL_INTERVAL_MS = 4000;
  */
 export function useInterviewSession(id: string | undefined, pollUntilGraded = false) {
   const fetcher = useCallback(() => interviewsApi.getSession(id as string), [id]);
-  const result = useApiResource(fetcher, [id], Boolean(id));
+  const result = useApiResource(fetcher, Boolean(id));
   const { data, refetch } = result;
   const status = data?.status;
 
   const refetchRef = useRef(refetch);
-  refetchRef.current = refetch;
+  useEffect(() => {
+    refetchRef.current = refetch;
+  });
 
   useEffect(() => {
     if (!pollUntilGraded) return;

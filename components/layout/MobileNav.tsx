@@ -6,18 +6,15 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Menu, X, LogOut } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { clearSession, getSessionUser } from "@/lib/auth/session";
+import { clearSession } from "@/lib/auth/session";
+import { useSessionUser } from "@/hooks/useSessionUser";
 import { NAV_GROUPS, isNavItemActive } from "@/components/layout/nav-config";
 
 export default function MobileNav() {
   const pathname = usePathname();
   const router = useRouter();
   const [open, setOpen] = useState(false);
-  const [email, setEmail] = useState<string | null>(null);
-
-  useEffect(() => {
-    setEmail(getSessionUser()?.email ?? null);
-  }, []);
+  const email = useSessionUser()?.email ?? null;
 
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
