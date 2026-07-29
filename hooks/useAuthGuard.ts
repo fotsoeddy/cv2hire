@@ -1,16 +1,8 @@
 "use client";
 
-import { useEffect, useSyncExternalStore } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { hasSession } from "@/lib/auth/session";
-
-function subscribe(): () => void {
-  return () => {};
-}
-
-function getServerSnapshot(): boolean {
-  return false;
-}
 
 /**
  * Client-side route guard. Tokens live in localStorage (not cookies), so
@@ -20,16 +12,24 @@ function getServerSnapshot(): boolean {
  * all. An actually-expired-but-present token is still caught later, by
  * the first authenticated request's 401 -> refresh -> redirect flow in
  * lib/api/client.ts.
+ *
+ * This deliberately checks `hasSession()` inside the effect rather than
+ * via a lazy `useState`/`useSyncExternalStore` initializer: those run
+ * during the SSR/first-paint render, before localStorage exists, so
+ * they'd always see "no session" and redirect every logged-in user on
+ * refresh. Only an effect (client-only, post-mount) reads the real value.
  */
 export function useAuthGuard() {
   const router = useRouter();
-  const authorized = useSyncExternalStore(subscribe, hasSession, getServerSnapshot);
+  const [checked, setChecked] = useState(false);
 
   useEffect(() => {
-    if (!authorized) {
+    if (!hasSession()) {
       router.replace("/auth/sign-in");
+      return;
     }
-  }, [authorized, router]);
+    setChecked(true);
+  }, [router]);
 
-  return authorized;
+  return checked;
 }

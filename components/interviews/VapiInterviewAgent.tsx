@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { Mic } from "lucide-react";
 import { useEffect, useRef } from "react";
 import { useVapiCall } from "@/hooks/useVapiCall";
 import type { InterviewQuestion } from "@/types/interviews";
@@ -21,8 +22,10 @@ export default function VapiInterviewAgent({
   questions,
   onEnd,
 }: VapiInterviewAgentProps) {
-  const { status, isSpeaking, transcript, error, start, stop, retry } = useVapiCall();
+  const { status, isSpeaking, localVolume, transcript, error, start, stop, retry } =
+    useVapiCall();
   const hasEndedRef = useRef(false);
+  const transcriptEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (status === "ended" && !hasEndedRef.current) {
@@ -30,6 +33,10 @@ export default function VapiInterviewAgent({
       onEnd();
     }
   }, [status, onEnd]);
+
+  useEffect(() => {
+    transcriptEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+  }, [transcript]);
 
   if (!ASSISTANT_ID) {
     return (
@@ -56,37 +63,66 @@ export default function VapiInterviewAgent({
     });
   };
 
-  const lastMessage = transcript[transcript.length - 1];
+  const live = status === "active" || status === "connecting";
+  const userScale = 1 + Math.min(localVolume, 1) * 0.35;
 
   return (
-    <>
-      <div className="call-view">
+    <div className="space-y-6">
+      {/* Video-call style split view */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {/* AI Interviewer */}
-        <div className="card-interviewer">
-          <div className="avatar">
-            <Image
-              src="/ai-avatar.png"
-              alt="AI Interviewer"
-              width={65}
-              height={54}
-              className="object-cover"
-            />
-            {isSpeaking && <span className="animate-speak" />}
+        <div
+          className={cn(
+            "relative rounded-2xl overflow-hidden border transition-colors duration-300 aspect-video sm:aspect-square",
+            "bg-[linear-gradient(to_bottom,#171532,#08090D)]",
+            isSpeaking ? "border-primary-200/60" : "border-white/5"
+          )}
+        >
+          <div className="absolute inset-0 flex-center">
+            <div className="relative size-24 sm:size-28 rounded-full flex-center">
+              {isSpeaking && (
+                <span className="absolute inset-0 rounded-full bg-primary-200/40 animate-ping" />
+              )}
+              <div className="relative size-full rounded-full overflow-hidden border-2 border-primary-200/40 bg-primary-100/10">
+                <Image src="/ai-avatar.png" alt="AI Interviewer" fill className="object-cover" />
+              </div>
+            </div>
           </div>
-          <h3>AI Interviewer</h3>
+          <div className="absolute bottom-3 left-3 flex items-center gap-2 px-3 py-1.5 rounded-full bg-dark-100/70 backdrop-blur-sm border border-white/10">
+            <span
+              className={cn(
+                "size-2 rounded-full",
+                isSpeaking ? "bg-success-100" : "bg-light-400"
+              )}
+            />
+            <span className="text-xs font-semibold text-white">AI Interviewer</span>
+          </div>
         </div>
 
         {/* Candidate */}
-        <div className="card-border">
-          <div className="card-content">
-            <Image
-              src="/user-avatar.png"
-              alt="You"
-              width={539}
-              height={539}
-              className="rounded-full object-cover size-[120px]"
-            />
-            <h3>You</h3>
+        <div
+          className={cn(
+            "relative rounded-2xl overflow-hidden border transition-colors duration-300 aspect-video sm:aspect-square",
+            "bg-[linear-gradient(to_bottom,#1A1C20,#08090D)]",
+            live && localVolume > 0.05 ? "border-success-100/50" : "border-white/5"
+          )}
+        >
+          <div className="absolute inset-0 flex-center">
+            <div className="relative size-24 sm:size-28 rounded-full flex-center">
+              {live && (
+                <span
+                  className="absolute inset-0 rounded-full bg-success-100/25 transition-transform duration-100 ease-out"
+                  style={{ transform: `scale(${userScale})` }}
+                />
+              )}
+              <div className="relative size-full rounded-full overflow-hidden border-2 border-white/10">
+                <Image src="/user-avatar.png" alt="You" fill className="object-cover" />
+              </div>
+            </div>
+          </div>
+          <div className="absolute bottom-3 left-3 flex items-center gap-2 px-3 py-1.5 rounded-full bg-dark-100/70 backdrop-blur-sm border border-white/10">
+            <Mic className="size-3.5 text-white" />
+            <span className="text-xs font-semibold text-white">You</span>
           </div>
         </div>
       </div>
@@ -97,13 +133,46 @@ export default function VapiInterviewAgent({
         </div>
       )}
 
-      {lastMessage && status === "active" && (
-        <div className="transcript-border">
-          <div className="transcript">
-            <p className="animate-fadeIn">{lastMessage.content}</p>
+      {/* Full transcript */}
+      <div className="card-border">
+        <div className="card p-4 sm:p-5">
+          <h4 className="text-sm font-semibold text-light-400 mb-3">Transcript</h4>
+          <div className="flex flex-col gap-2.5 max-h-80 overflow-y-auto pr-1">
+            {transcript.length === 0 ? (
+              <p className="text-sm text-light-400 text-center py-6">
+                {live
+                  ? "Listening — the conversation will appear here as you talk."
+                  : "The transcript will appear here once the interview starts."}
+              </p>
+            ) : (
+              transcript.map((entry, i) => (
+                <div
+                  key={i}
+                  className={cn(
+                    "flex flex-col max-w-[85%] animate-fadeIn",
+                    entry.role === "assistant" ? "items-start self-start" : "items-end self-end"
+                  )}
+                >
+                  <span className="text-[11px] text-light-400 mb-0.5 px-1">
+                    {entry.role === "assistant" ? "AI Interviewer" : "You"}
+                  </span>
+                  <p
+                    className={cn(
+                      "text-sm px-3.5 py-2 rounded-2xl leading-relaxed",
+                      entry.role === "assistant"
+                        ? "bg-dark-300 text-light-100 rounded-tl-sm"
+                        : "bg-primary-200/15 text-primary-100 rounded-tr-sm"
+                    )}
+                  >
+                    {entry.content}
+                  </p>
+                </div>
+              ))
+            )}
+            <div ref={transcriptEndRef} />
           </div>
         </div>
-      )}
+      </div>
 
       <div className="w-full flex justify-center gap-4">
         {status === "active" ? (
@@ -136,6 +205,6 @@ export default function VapiInterviewAgent({
           </button>
         )}
       </div>
-    </>
+    </div>
   );
 }

@@ -117,8 +117,12 @@ async function performRequest<T>(
   isRetry: boolean
 ): Promise<T> {
   const url = `${BASE_URL.replace(/\/$/, "")}${path}`;
+  // FormData bodies must NOT have Content-Type set manually — fetch needs
+  // to generate the multipart boundary itself, and a fixed header breaks
+  // that on the receiving end (e.g. file uploads).
+  const isFormData = typeof FormData !== "undefined" && options.body instanceof FormData;
   const requestHeaders: Record<string, string> = {
-    "Content-Type": "application/json",
+    ...(isFormData ? {} : { "Content-Type": "application/json" }),
     ...(options.headers as Record<string, string> | undefined),
   };
 

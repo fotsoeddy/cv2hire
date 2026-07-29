@@ -1,18 +1,48 @@
-import type { CVTip } from "@/types";
+import type { CVAnalysisFeedbackItem } from "@/types/cv";
 import { Accordion, AccordionItem, AccordionHeader, AccordionContent } from "@/components/ui/Accordion";
 import { ScoreCircle, ScoreBadge } from "@/components/cv/ScoreComponents";
-import { CheckCircle, AlertTriangle } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface FeedbackDetailsProps {
-  categories: {
-    id: string;
-    label: string;
-    score: number;
-    tips: CVTip[];
-  }[];
+  items: CVAnalysisFeedbackItem[];
 }
 
-export default function FeedbackDetails({ categories }: FeedbackDetailsProps) {
+const CATEGORY_LABELS: Record<string, string> = {
+  formatting: "Formatting",
+  keywords: "Keywords",
+  experience: "Experience",
+  projects: "Projects",
+  skills: "Skills",
+  education: "Education",
+};
+
+const PRIORITY_STYLES: Record<string, string> = {
+  high: "bg-red-500/10 text-red-500",
+  medium: "bg-yellow-500/10 text-yellow-500",
+  low: "bg-success-100/10 text-success-100",
+};
+
+export default function FeedbackDetails({ items }: FeedbackDetailsProps) {
+  const grouped = new Map<string, CVAnalysisFeedbackItem[]>();
+  for (const item of items) {
+    const list = grouped.get(item.category) ?? [];
+    list.push(item);
+    grouped.set(item.category, list);
+  }
+
+  const categories = Array.from(grouped.entries()).map(([category, categoryItems]) => ({
+    id: category,
+    label: CATEGORY_LABELS[category] ?? category,
+    score: Math.round(
+      categoryItems.reduce((sum, i) => sum + i.score, 0) / categoryItems.length
+    ),
+    items: categoryItems,
+  }));
+
+  if (categories.length === 0) {
+    return <p className="text-sm text-light-400">No detailed feedback available for this analysis.</p>;
+  }
+
   return (
     <div className="flex flex-col gap-4 w-full">
       <Accordion allowMultiple>
@@ -29,22 +59,17 @@ export default function FeedbackDetails({ categories }: FeedbackDetailsProps) {
             </AccordionHeader>
             <AccordionContent itemId={cat.id}>
               <div className="flex flex-col gap-3 pl-2">
-                {cat.tips.map((tip, idx) => (
-                  <div
-                    key={idx}
-                    className="flex items-start gap-3 p-3 rounded-xl bg-dark-300"
-                  >
-                    {tip.type === "good" ? (
-                      <CheckCircle className="size-5 text-success-100 mt-0.5 flex-shrink-0" />
-                    ) : (
-                      <AlertTriangle className="size-5 text-yellow-400 mt-0.5 flex-shrink-0" />
-                    )}
-                    <div>
-                      <p className="text-sm font-medium text-white">{tip.tip}</p>
-                      {tip.explanation && (
-                        <p className="text-sm text-light-400 mt-1">{tip.explanation}</p>
+                {cat.items.map((item) => (
+                  <div key={item.id} className="flex items-start gap-3 p-3 rounded-xl bg-dark-300">
+                    <span
+                      className={cn(
+                        "px-2 py-0.5 rounded-full text-[10px] font-bold uppercase mt-0.5 flex-shrink-0",
+                        PRIORITY_STYLES[item.priority]
                       )}
-                    </div>
+                    >
+                      {item.priority}
+                    </span>
+                    <p className="text-sm text-white">{item.feedback}</p>
                   </div>
                 ))}
               </div>

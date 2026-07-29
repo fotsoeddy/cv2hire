@@ -43,6 +43,7 @@ export function useVapiCall() {
     hasVapiPublicKey() ? "idle" : "error"
   );
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const [localVolume, setLocalVolume] = useState(0);
   const [transcript, setTranscript] = useState<TranscriptEntry[]>([]);
   const [error, setError] = useState<string | null>(() =>
     hasVapiPublicKey() ? null : MISSING_KEY_MESSAGE
@@ -67,6 +68,7 @@ export function useVapiCall() {
     const handleCallEnd = () => setStatus("ended");
     const handleSpeechStart = () => setIsSpeaking(true);
     const handleSpeechEnd = () => setIsSpeaking(false);
+    const handleLocalVolume = (volume: number) => setLocalVolume(volume);
     const handleMessage = (message: VapiTranscriptMessage) => {
       if (
         message.type === "transcript" &&
@@ -89,6 +91,7 @@ export function useVapiCall() {
     vapi.on("call-end", handleCallEnd);
     vapi.on("speech-start", handleSpeechStart);
     vapi.on("speech-end", handleSpeechEnd);
+    vapi.on("local-volume-level", handleLocalVolume);
     vapi.on("message", handleMessage);
     vapi.on("error", handleError);
 
@@ -97,6 +100,7 @@ export function useVapiCall() {
       vapi.removeListener("call-end", handleCallEnd);
       vapi.removeListener("speech-start", handleSpeechStart);
       vapi.removeListener("speech-end", handleSpeechEnd);
+      vapi.removeListener("local-volume-level", handleLocalVolume);
       vapi.removeListener("message", handleMessage);
       vapi.removeListener("error", handleError);
     };
@@ -106,6 +110,7 @@ export function useVapiCall() {
     lastParamsRef.current = params;
     setError(null);
     setTranscript([]);
+    setLocalVolume(0);
     setStatus("connecting");
     try {
       const vapi = getVapiClient();
@@ -140,5 +145,5 @@ export function useVapiCall() {
     };
   }, [stop]);
 
-  return { status, isSpeaking, transcript, error, start, stop, retry };
+  return { status, isSpeaking, localVolume, transcript, error, start, stop, retry };
 }

@@ -1,17 +1,16 @@
 import { ScoreGauge, ScoreBadge } from "@/components/cv/ScoreComponents";
-import type { CVFeedback } from "@/types";
+import type { CVAnalysisDetail } from "@/types/cv";
 
 interface ResumeSummaryProps {
-  feedback: CVFeedback;
+  analysis: CVAnalysisDetail;
 }
 
-export default function ResumeSummary({ feedback }: ResumeSummaryProps) {
+export default function ResumeSummary({ analysis }: ResumeSummaryProps) {
   const categories = [
-    { label: "ATS", score: feedback.ATS.score },
-    { label: "Tone & Style", score: feedback.toneAndStyle.score },
-    { label: "Content", score: feedback.content.score },
-    { label: "Structure", score: feedback.structure.score },
-    { label: "Skills", score: feedback.skills.score },
+    { label: "ATS Compatibility", score: analysis.ats_score },
+    { label: "Readability", score: analysis.readability_score },
+    { label: "Keyword Match", score: analysis.keyword_match_score },
+    { label: "Experience", score: analysis.experience_score },
   ];
 
   return (
@@ -19,8 +18,8 @@ export default function ResumeSummary({ feedback }: ResumeSummaryProps) {
       {/* Overall Score */}
       <div className="flex flex-col items-center gap-4 card p-5 md:p-6 rounded-2xl w-full border border-white/5">
         <h3 className="text-base font-semibold text-white">Overall Score</h3>
-        <ScoreGauge score={feedback.overallScore} />
-        <ScoreBadge score={feedback.overallScore} />
+        <ScoreGauge score={analysis.overall_score} />
+        <ScoreBadge score={analysis.overall_score} />
       </div>
 
       {/* Category Breakdown */}
