@@ -1,28 +1,55 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowLeft } from "lucide-react";
-import {
-  mockJobs,
-  mockInterviews,
-  mockInterviewFeedback,
-} from "@/constants/mock-data";
-import { getStableCover, getTechLogos } from "@/lib/utils";
-import InterviewCard from "@/components/interviews/InterviewCard";
-import { cn } from "@/lib/utils";
+import { useParams, useRouter } from "next/navigation";
+import { useJob } from "@/hooks/useJob";
+import { useCreateInterviewSession } from "@/hooks/useCreateInterviewSession";
+import { cn, getStableCover } from "@/lib/utils";
 
-export default async function JobDetailPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
-  const { id } = await params;
-  const job = mockJobs.find((j) => j.id === id);
+function JobDetailSkeleton() {
+  return (
+    <div className="space-y-8 animate-pulse">
+      <div className="h-4 w-24 rounded bg-white/5" />
+      <div className="card p-8 rounded-2xl space-y-6">
+        <div className="flex items-center gap-6">
+          <div className="size-[80px] rounded-full bg-white/5" />
+          <div className="flex-1 space-y-2">
+            <div className="h-7 w-1/3 rounded bg-white/5" />
+            <div className="h-4 w-1/4 rounded bg-white/5" />
+          </div>
+        </div>
+        <div className="h-20 rounded bg-white/5" />
+      </div>
+    </div>
+  );
+}
 
-  if (!job) {
+export default function JobDetailPage() {
+  const params = useParams();
+  const router = useRouter();
+  const id = params.id as string;
+
+  const { data: job, loading, error } = useJob(id);
+  const { createSession, loading: creating, error: createError } = useCreateInterviewSession();
+
+  const handleStartInterview = async () => {
+    const session = await createSession({ job_id: id });
+    if (session) {
+      router.push(`/dashboard/interviews/session/${session.id}`);
+    }
+  };
+
+  if (loading) {
+    return <JobDetailSkeleton />;
+  }
+
+  if (error || !job) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[50vh] gap-4">
         <h2>Job Not Found</h2>
-        <p className="text-light-400">This role doesn&apos;t exist.</p>
+        <p className="text-light-400">{error || "This role doesn't exist."}</p>
         <Link href="/dashboard/jobs" className="btn-primary">
           Browse Jobs
         </Link>
@@ -30,9 +57,8 @@ export default async function JobDetailPage({
     );
   }
 
-  const jobInterviews = mockInterviews.filter((i) => i.jobId === job.id);
-  const techIcons = getTechLogos(job.techstack);
   const coverImage = getStableCover(job.id);
+  const noQuestions = job.total_questions === 0;
 
   return (
     <div className="space-y-8">
@@ -49,73 +75,79 @@ export default async function JobDetailPage({
         <div className="flex items-center gap-6 max-sm:flex-col max-sm:items-start">
           <Image
             src={coverImage}
-            alt={job.company}
+            alt={job.name}
             width={80}
             height={80}
             className="rounded-full object-cover size-[80px]"
           />
           <div className="flex-1">
-            <h2 className="capitalize">{job.role}</h2>
-            <p className="text-light-400 mt-1">
-              {job.company} · {job.level} · {job.type}
+            <h2 className="capitalize">{job.name}</h2>
+            <p className="text-light-400 mt-1 capitalize">
+              {job.experience_level.replace(/_/g, " ")}
+              {job.seniority_level && ` · ${job.seniority_level}`}
             </p>
           </div>
-          <Link
-            href={
-              jobInterviews.find((i) => i.status === "pending")
-                ? `/dashboard/interviews/session/${jobInterviews.find((i) => i.status === "pending")!.id}`
-                : `/dashboard/interviews/session/int-3`
-            }
-            className="btn-primary"
-          >
-            Start Mock Interview
-          </Link>
+          <div className="flex flex-col items-end gap-2">
+            <button
+              onClick={handleStartInterview}
+              disabled={creating || noQuestions}
+              className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {creating ? "Starting..." : "Start Mock Interview"}
+            </button>
+            {noQuestions && (
+              <p className="text-xs text-light-400 text-right max-w-50">
+                Questions haven&apos;t been generated for this role yet.
+              </p>
+            )}
+          </div>
         </div>
+
+        {createError && (
+          <div className="p-3.5 bg-red-500/10 border border-red-500/20 text-red-500 text-sm rounded-xl">
+            {createError}
+          </div>
+        )}
 
         <p className="text-light-100">{job.description}</p>
 
-        {/* Tech Stack */}
-        <div>
-          <h3 className="text-base font-semibold text-white mb-3">
-            Tech Stack
-          </h3>
-          <div className="flex flex-wrap gap-2">
-            {job.techstack.map((tech) => (
-              <span
-                key={tech}
-                className="px-3 py-1.5 bg-dark-300 rounded-full text-sm text-light-100"
-              >
-                {tech}
-              </span>
-            ))}
+        {job.requirements && (
+          <div>
+            <h3 className="text-base font-semibold text-white mb-3">Requirements</h3>
+            <p className="text-light-100 whitespace-pre-line">{job.requirements}</p>
           </div>
+        )}
+
+        {job.skills.length > 0 && (
+          <div>
+            <h3 className="text-base font-semibold text-white mb-3">Skills</h3>
+            <div className="flex flex-wrap gap-2">
+              {job.skills.map((skill) => (
+                <span
+                  key={skill.id}
+                  className={cn(
+                    "px-3 py-1.5 rounded-full text-sm font-medium",
+                    skill.is_required
+                      ? "bg-primary-200/15 text-primary-200"
+                      : "bg-dark-300 text-light-100"
+                  )}
+                >
+                  {skill.name}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <div className="flex items-center gap-4 pt-4 border-t border-white/5 text-sm text-light-400">
+          <span>
+            {job.total_questions} question{job.total_questions === 1 ? "" : "s"}
+          </span>
+          {job.estimated_duration_seconds ? (
+            <span>~{Math.round(job.estimated_duration_seconds / 60)} min</span>
+          ) : null}
         </div>
       </div>
-
-      {/* Past Interviews for this Job */}
-      {jobInterviews.length > 0 && (
-        <div>
-          <h3 className="text-xl font-semibold text-white mb-4">
-            Your Interviews for this Role
-          </h3>
-          <div className="interviews-section">
-            {jobInterviews.map((interview) => {
-              const feedback = mockInterviewFeedback.find(
-                (f) => f.interviewId === interview.id
-              );
-              return (
-                <InterviewCard
-                  key={interview.id}
-                  interviewId={interview.id}
-                  job={job}
-                  feedback={feedback}
-                  createdAt={interview.createdAt}
-                />
-              );
-            })}
-          </div>
-        </div>
-      )}
     </div>
   );
 }

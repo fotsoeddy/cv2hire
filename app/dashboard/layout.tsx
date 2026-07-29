@@ -1,13 +1,15 @@
 "use client";
 
+import Image from "next/image";
 import Sidebar from "@/components/layout/Sidebar";
 import MobileNav from "@/components/layout/MobileNav";
 import { SidebarProvider, useSidebar } from "@/components/layout/SidebarContext";
 import { cn } from "@/lib/utils";
+import { useAuthGuard } from "@/hooks/useAuthGuard";
 
 function DashboardContent({ children }: { children: React.ReactNode }) {
   const { collapsed } = useSidebar();
-  
+
   return (
     <main
       className={cn(
@@ -20,11 +22,32 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
   );
 }
 
+function AuthCheckingScreen() {
+  return (
+    <div className="min-h-screen flex-center">
+      <Image
+        src="/logo.png"
+        alt="CV2Hire"
+        width={40}
+        height={40}
+        className="object-contain animate-pulse"
+        priority
+      />
+    </div>
+  );
+}
+
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const authorized = useAuthGuard();
+
+  if (!authorized) {
+    return <AuthCheckingScreen />;
+  }
+
   return (
     <SidebarProvider>
       <div className="min-h-screen">

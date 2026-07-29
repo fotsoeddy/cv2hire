@@ -711,8 +711,13 @@
   padding: 0.75rem 1rem;
   border-radius: 0.75rem;
   color: #d6e0ff;
-  transition: all 0.15s;
+  transition: background-color 150ms ease, color 150ms ease;
   text-decoration: none;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  font: inherit;
+  text-align: left;
 }
 .sidebar-link:hover {
   background-color: rgba(255,255,255,0.05);
@@ -721,6 +726,14 @@
 .sidebar-link-active {
   background-color: rgba(202,197,254,0.1);
   color: #cac5fe;
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
 }
 
 /* --- Scroll reveal --- */

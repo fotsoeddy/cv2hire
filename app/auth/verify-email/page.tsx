@@ -3,7 +3,8 @@
 import Image from "next/image";
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { authApi, ApiRequestError } from "@/lib/api-client";
+import { authApi } from "@/lib/api/auth";
+import { ApiRequestError } from "@/lib/api/client";
 
 export default function VerifyEmailPage() {
   const router = useRouter();

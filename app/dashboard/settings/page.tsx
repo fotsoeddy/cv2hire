@@ -1,23 +1,22 @@
 "use client";
 
-import { useState } from "react";
-import { mockUser } from "@/constants/mock-data";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { CreditCard } from "lucide-react";
+import { clearSession, getSessionUser, type SessionUser } from "@/lib/auth/session";
+import { ComingSoon } from "@/components/ui/ComingSoon";
 
 export default function SettingsPage() {
-  const [name, setName] = useState(mockUser.name);
-  const [email, setEmail] = useState(mockUser.email);
-  const [saved, setSaved] = useState(false);
+  const router = useRouter();
+  const [user, setUser] = useState<SessionUser | null>(null);
 
-  const handleSave = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Placeholder: will connect to Django REST API later
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
-  };
+  useEffect(() => {
+    setUser(getSessionUser());
+  }, []);
 
   const handleLogout = () => {
-    // Placeholder: will connect to Django REST auth later
-    window.location.href = "/auth/sign-in";
+    clearSession();
+    router.push("/auth/sign-in");
   };
 
   return (
@@ -27,46 +26,33 @@ export default function SettingsPage() {
         <p className="text-light-400 mt-1">Manage your account settings.</p>
       </div>
 
-      {/* Profile */}
-      <div className="card p-8 rounded-2xl space-y-6">
-        <h3 className="text-lg font-semibold text-white">Profile</h3>
-        <form onSubmit={handleSave} className="space-y-4">
-          <div className="form-div">
-            <label htmlFor="name">Full Name</label>
-            <input
-              id="name"
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
+      {/* Account */}
+      <div className="card p-8 rounded-2xl space-y-4">
+        <h3 className="text-lg font-semibold text-white">Account</h3>
+        <div className="flex items-center justify-between bg-dark-300 p-4 rounded-xl">
+          <div>
+            <p className="text-sm text-light-400">Email</p>
+            <p className="text-white font-medium">{user?.email ?? "—"}</p>
           </div>
-          <div className="form-div">
-            <label htmlFor="settings-email">Email</label>
-            <input
-              id="settings-email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </div>
-          <button type="submit" className="btn-primary">
-            {saved ? "Saved ✓" : "Save Changes"}
-          </button>
-        </form>
+        </div>
+        <p className="text-xs text-light-400">
+          Editing your name and email needs a profile API endpoint that doesn&apos;t exist on the
+          backend yet — see the{" "}
+          <a href="/dashboard/profile" className="text-primary-200 hover:underline">
+            Profile
+          </a>{" "}
+          page for details.
+        </p>
       </div>
 
       {/* Subscription */}
-      <div className="card p-8 rounded-2xl space-y-4">
+      <div className="space-y-4">
         <h3 className="text-lg font-semibold text-white">Subscription</h3>
-        <div className="flex items-center justify-between bg-dark-300 p-4 rounded-xl">
-          <div>
-            <p className="font-medium text-white capitalize">{mockUser.plan} Plan</p>
-            <p className="text-sm text-light-400">{mockUser.credits} credits remaining</p>
-          </div>
-          <a href="/dashboard/pricing" className="btn-secondary text-sm">
-            Manage Plan
-          </a>
-        </div>
+        <ComingSoon
+          icon={CreditCard}
+          title="Billing isn't wired up yet"
+          description="The backend has credit wallet and subscription models, but no API endpoints exposing them. This section will show your plan and credit balance once that's built."
+        />
       </div>
 
       {/* Danger Zone */}

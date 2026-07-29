@@ -5,7 +5,9 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { authApi, ApiRequestError, type ValidationError } from "@/lib/api-client";
+import { authApi } from "@/lib/api/auth";
+import { ApiRequestError, type ValidationError } from "@/lib/api/client";
+import { setSession } from "@/lib/auth/session";
 import { PasswordField } from "@/components/ui/PasswordField";
 import { GoogleSignInButton } from "@/components/auth/GoogleSignInButton";
 
@@ -191,8 +193,11 @@ export default function SignUpPage() {
 
     try {
       const response = await authApi.googleLogin(idToken);
-      localStorage.setItem("authToken", response.access);
-      localStorage.setItem("refreshToken", response.refresh);
+      setSession({
+        access: response.access,
+        refresh: response.refresh,
+        user: response.user,
+      });
       router.push("/dashboard");
     } catch (err) {
       setGoogleLoading(false);

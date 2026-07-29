@@ -1,11 +1,11 @@
 "use client";
 
-import { Briefcase } from "lucide-react";
+import { Mic } from "lucide-react";
 import JobCard, { JobCardSkeleton } from "@/components/interviews/JobCard";
 import { useJobs } from "@/hooks/useJobs";
 import { useInterviewSessions } from "@/hooks/useInterviewSessions";
 
-export default function JobsPage() {
+export default function MockInterviewHubPage() {
   const { data: jobs, loading, error } = useJobs();
   const { data: sessions } = useInterviewSessions();
 
@@ -16,11 +16,16 @@ export default function JobsPage() {
 
   return (
     <div className="space-y-8">
-      <div>
-        <h2>Available Roles</h2>
-        <p className="text-light-400 mt-1">
-          Browse available job roles and start a mock interview to practice.
-        </p>
+      <div className="flex items-center gap-3">
+        <div className="size-11 rounded-2xl bg-primary-200/10 flex-center flex-shrink-0">
+          <Mic className="size-5 text-primary-200" />
+        </div>
+        <div>
+          <h2>AI Mock Interview</h2>
+          <p className="text-light-400 mt-1">
+            Pick a role to practice — the AI interviewer will ask real, role-specific questions.
+          </p>
+        </div>
       </div>
 
       {error && (
@@ -46,7 +51,7 @@ export default function JobsPage() {
           <div className="card-border">
             <div className="card p-10 flex flex-col items-center text-center gap-3">
               <div className="size-12 rounded-full bg-primary-200/10 flex-center">
-                <Briefcase className="size-6 text-primary-200" />
+                <Mic className="size-6 text-primary-200" />
               </div>
               <h4 className="text-base font-semibold text-white">No roles available yet</h4>
               <p className="text-sm text-light-400 max-w-sm">

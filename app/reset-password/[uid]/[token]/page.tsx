@@ -4,7 +4,8 @@ import { use, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { authApi, ApiRequestError, type ValidationError } from "@/lib/api-client";
+import { authApi } from "@/lib/api/auth";
+import { ApiRequestError, type ValidationError } from "@/lib/api/client";
 
 interface Props {
   params: Promise<{

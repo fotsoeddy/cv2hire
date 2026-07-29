@@ -3,7 +3,8 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
-import { authApi, ApiRequestError, type ValidationError } from "@/lib/api-client";
+import { authApi } from "@/lib/api/auth";
+import { ApiRequestError, type ValidationError } from "@/lib/api/client";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
