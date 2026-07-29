@@ -2,6 +2,7 @@
 
 import { Mic } from "lucide-react";
 import JobCard, { JobCardSkeleton } from "@/components/interviews/JobCard";
+import { VoiceIntakeButton } from "@/components/interviews/VoiceIntakeButton";
 import { useJobs } from "@/hooks/useJobs";
 import { useInterviewSessions } from "@/hooks/useInterviewSessions";
 
@@ -26,6 +27,14 @@ export default function MockInterviewHubPage() {
             Pick a role to practice — the AI interviewer will ask real, role-specific questions.
           </p>
         </div>
+      </div>
+
+      <VoiceIntakeButton />
+
+      <div className="flex items-center gap-3">
+        <div className="flex-1 h-px bg-white/10" />
+        <span className="text-xs text-light-400">OR PICK A ROLE MANUALLY</span>
+        <div className="flex-1 h-px bg-white/10" />
       </div>
 
       {error && (
