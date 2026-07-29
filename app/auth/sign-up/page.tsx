@@ -4,16 +4,14 @@ import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronLeft, ChevronRight, Pencil } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { authApi, ApiRequestError, type ValidationError } from "@/lib/api-client";
 import { PasswordField } from "@/components/ui/PasswordField";
 import { GoogleSignInButton } from "@/components/auth/GoogleSignInButton";
 
 const STEPS = [
-  { title: "What's your name?", subtitle: "Let's start with the basics." },
-  { title: "What's your email?", subtitle: "We'll send a verification code here." },
-  { title: "Secure your account", subtitle: "Use at least 8 characters." },
-  { title: "Review & confirm", subtitle: "Almost done — check everything looks right." },
+  { title: "Personal Details", subtitle: "Let's start with the basics." },
+  { title: "Secure your account", subtitle: "Set a password and review terms." },
 ] as const;
 
 const LAST_STEP = STEPS.length - 1;
@@ -21,11 +19,11 @@ const LAST_STEP = STEPS.length - 1;
 const FIELD_STEP: Record<string, number> = {
   first_name: 0,
   last_name: 0,
-  email: 1,
-  password: 2,
-  password_confirm: 2,
-  confirm_password: 2,
-  accepted_terms_and_policy: 3,
+  email: 0,
+  password: 1,
+  password_confirm: 1,
+  confirm_password: 1,
+  accepted_terms_and_policy: 1,
 };
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -45,13 +43,25 @@ export default function SignUpPage() {
   const [fieldErrors, setFieldErrors] = useState<ValidationError>({});
   const [stepErrors, setStepErrors] = useState<Partial<Record<number, string>>>({});
   const [stepHeight, setStepHeight] = useState<number>();
+  const [isDesktop, setIsDesktop] = useState(true);
 
   const stepRefs = useRef<Array<HTMLDivElement | null>>([]);
   const isFirstRender = useRef(true);
 
+  useEffect(() => {
+    const handleResize = () => setIsDesktop(window.innerWidth >= 768);
+    handleResize(); // init
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   // Keep the wizard card's height in sync with whichever step is active so
   // shorter steps don't leave a block of empty space below their content.
   useEffect(() => {
+    if (isDesktop) {
+      setStepHeight(undefined);
+      return;
+    }
     const el = stepRefs.current[step];
     if (!el) return;
 
@@ -59,7 +69,7 @@ export default function SignUpPage() {
     const observer = new ResizeObserver((entries) => setStepHeight(entries[0].contentRect.height));
     observer.observe(el);
     return () => observer.disconnect();
-  }, [step]);
+  }, [step, isDesktop]);
 
   // Move focus to the new step's first field on navigation, but not on the
   // initial page load (autofocus on mount is jarring, especially on mobile).
@@ -68,9 +78,10 @@ export default function SignUpPage() {
       isFirstRender.current = false;
       return;
     }
+    if (isDesktop) return; // Don't manage focus like this on desktop
     const el = stepRefs.current[step];
     el?.querySelector<HTMLElement>("input:not([type=checkbox])")?.focus();
-  }, [step]);
+  }, [step, isDesktop]);
 
   const clearFieldError = (field: string) => {
     setFieldErrors((prev) => {
@@ -86,21 +97,27 @@ export default function SignUpPage() {
   };
 
   const validateStep = (index: number): boolean => {
-    if (index === 0 && (!firstName.trim() || !lastName.trim())) {
-      setStepErrors((prev) => ({ ...prev, 0: "Please enter your first and last name." }));
-      return false;
+    if (index === 0) {
+      if (!firstName.trim() || !lastName.trim()) {
+        setStepErrors((prev) => ({ ...prev, 0: "Please enter your first and last name." }));
+        return false;
+      }
+      if (!EMAIL_RE.test(email.trim())) {
+        setStepErrors((prev) => ({ ...prev, 0: "Please enter a valid email address." }));
+        return false;
+      }
     }
-    if (index === 1 && !EMAIL_RE.test(email.trim())) {
-      setStepErrors((prev) => ({ ...prev, 1: "Please enter a valid email address." }));
-      return false;
-    }
-    if (index === 2) {
+    if (index === 1) {
       if (password.length < 8) {
-        setStepErrors((prev) => ({ ...prev, 2: "Password must be at least 8 characters." }));
+        setStepErrors((prev) => ({ ...prev, 1: "Password must be at least 8 characters." }));
         return false;
       }
       if (password !== confirmPassword) {
-        setStepErrors((prev) => ({ ...prev, 2: "Your passwords do not match. Please try again." }));
+        setStepErrors((prev) => ({ ...prev, 1: "Your passwords do not match. Please try again." }));
+        return false;
+      }
+      if (!acceptedTerms) {
+        setStepErrors((prev) => ({ ...prev, 1: "Please accept the Terms of Service and Privacy Policy to continue." }));
         return false;
       }
     }
@@ -119,25 +136,18 @@ export default function SignUpPage() {
     setStep((s) => Math.max(s - 1, 0));
   };
 
-  const goToStep = (index: number) => {
-    setError(null);
-    setStep(index);
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (step < LAST_STEP) {
-      goNext();
-      return;
-    }
-
-    if (!acceptedTerms) {
-      setStepErrors((prev) => ({
-        ...prev,
-        3: "Please accept the Terms of Service and Privacy Policy to continue.",
-      }));
-      return;
+    if (isDesktop) {
+      if (!validateStep(0)) return;
+      if (!validateStep(1)) return;
+    } else {
+      if (step < LAST_STEP) {
+        goNext();
+        return;
+      }
+      if (!validateStep(LAST_STEP)) return;
     }
 
     setLoading(true);
@@ -193,7 +203,7 @@ export default function SignUpPage() {
   const busy = loading || googleLoading;
 
   return (
-    <div className="w-full max-w-120 card-border">
+    <div className="w-full max-w-120 card-border mx-auto">
       <div className="flex flex-col gap-5 card py-6 px-5 sm:py-9 sm:px-8">
         <div className="flex flex-col items-center gap-2">
           <Image src="/logo.png" alt="CV2Hire Logo" width={40} height={40} className="object-contain" priority />
@@ -203,7 +213,8 @@ export default function SignUpPage() {
           </p>
         </div>
 
-        <div className="flex flex-col gap-2">
+        {/* Mobile-only Wizard Progress */}
+        <div className="flex flex-col gap-2 md:hidden">
           <div className="wizard-progress">
             {STEPS.map((s, i) => (
               <div key={s.title} className="wizard-progress-segment" data-state={i <= step ? "active" : "idle"}>
@@ -226,33 +237,21 @@ export default function SignUpPage() {
         )}
 
         <form onSubmit={handleSubmit} noValidate className="w-full flex flex-col gap-6">
-          <div className="wizard-viewport" style={{ height: stepHeight }}>
-            <div className="wizard-track" style={{ transform: `translateX(-${step * 100}%)` }}>
-              {/* Step 1: Name (+ Google shortcut) */}
-              <div
-                ref={(el) => {
-                  stepRefs.current[0] = el;
-                }}
-                className="wizard-step flex flex-col gap-4 pr-0.5"
-                inert={step !== 0}
-              >
+          {isDesktop ? (
+            // Desktop View: All fields in a single column
+            <div className="flex flex-col gap-6">
+              {/* Personal Details */}
+              <div className="flex flex-col gap-4">
                 <GoogleSignInButton
                   onCredential={handleGoogleCredential}
                   loading={googleLoading}
                   disabled={loading}
                 />
-
                 <div className="flex items-center gap-3">
                   <div className="flex-1 h-px bg-white/10" />
                   <span className="text-xs text-light-400">OR</span>
                   <div className="flex-1 h-px bg-white/10" />
                 </div>
-
-                <div className="flex flex-col gap-1">
-                  <h4 className="text-base font-semibold text-white">{STEPS[0].title}</h4>
-                  <p className="text-sm text-light-400">{STEPS[0].subtitle}</p>
-                </div>
-
                 <div className="flex flex-col sm:flex-row gap-3">
                   <div className="form-div flex-1">
                     <label htmlFor="firstName">First Name</label>
@@ -293,21 +292,6 @@ export default function SignUpPage() {
                     )}
                   </div>
                 </div>
-                {stepErrors[0] && <p className="text-red-500 text-xs">{stepErrors[0]}</p>}
-              </div>
-
-              {/* Step 2: Email */}
-              <div
-                ref={(el) => {
-                  stepRefs.current[1] = el;
-                }}
-                className="wizard-step flex flex-col gap-4 pr-0.5"
-                inert={step !== 1}
-              >
-                <div className="flex flex-col gap-1">
-                  <h4 className="text-base font-semibold text-white">{STEPS[1].title}</h4>
-                  <p className="text-sm text-light-400">{STEPS[1].subtitle}</p>
-                </div>
                 <div className="form-div">
                   <label htmlFor="email">Email Address</label>
                   <input
@@ -317,7 +301,7 @@ export default function SignUpPage() {
                     value={email}
                     onChange={(e) => {
                       setEmail(e.target.value);
-                      clearStepError(1);
+                      clearStepError(0);
                       clearFieldError("email");
                     }}
                     autoComplete="email"
@@ -325,21 +309,11 @@ export default function SignUpPage() {
                   />
                   {fieldErrors.email && <p className="text-red-500 text-xs mt-1">{fieldErrors.email.join(" ")}</p>}
                 </div>
-                {stepErrors[1] && <p className="text-red-500 text-xs">{stepErrors[1]}</p>}
+                {stepErrors[0] && <p className="text-red-500 text-xs">{stepErrors[0]}</p>}
               </div>
 
-              {/* Step 3: Password */}
-              <div
-                ref={(el) => {
-                  stepRefs.current[2] = el;
-                }}
-                className="wizard-step flex flex-col gap-4 pr-0.5"
-                inert={step !== 2}
-              >
-                <div className="flex flex-col gap-1">
-                  <h4 className="text-base font-semibold text-white">{STEPS[2].title}</h4>
-                  <p className="text-sm text-light-400">{STEPS[2].subtitle}</p>
-                </div>
+              {/* Secure Account */}
+              <div className="flex flex-col gap-4">
                 <PasswordField
                   id="password"
                   label="Password"
@@ -347,12 +321,13 @@ export default function SignUpPage() {
                   value={password}
                   onChange={(v) => {
                     setPassword(v);
-                    clearStepError(2);
+                    clearStepError(1);
                     clearFieldError("password");
                   }}
                   error={fieldErrors.password?.join(" ")}
                   autoComplete="new-password"
                 />
+                
                 <PasswordField
                   id="confirmPassword"
                   label="Confirm Password"
@@ -360,68 +335,20 @@ export default function SignUpPage() {
                   value={confirmPassword}
                   onChange={(v) => {
                     setConfirmPassword(v);
-                    clearStepError(2);
+                    clearStepError(1);
                   }}
                   error={fieldErrors.password_confirm?.join(" ") ?? fieldErrors.confirm_password?.join(" ")}
                   autoComplete="new-password"
                 />
-                {stepErrors[2] && <p className="text-red-500 text-xs">{stepErrors[2]}</p>}
-              </div>
 
-              {/* Step 4: Review + terms */}
-              <div
-                ref={(el) => {
-                  stepRefs.current[3] = el;
-                }}
-                className="wizard-step flex flex-col gap-4 pr-0.5"
-                inert={step !== 3}
-              >
-                <div className="flex flex-col gap-1">
-                  <h4 className="text-base font-semibold text-white">{STEPS[3].title}</h4>
-                  <p className="text-sm text-light-400">{STEPS[3].subtitle}</p>
-                </div>
-
-                <div className="rounded-2xl bg-dark-200/60 border border-white/5 divide-y divide-white/5">
-                  <button
-                    type="button"
-                    onClick={() => goToStep(0)}
-                    className="w-full flex items-center justify-between gap-3 px-4 py-3 text-left"
-                  >
-                    <div className="min-w-0">
-                      <p className="text-xs text-light-400">Name</p>
-                      <p className="text-sm text-white font-medium truncate">
-                        {firstName} {lastName}
-                      </p>
-                    </div>
-                    <span className="flex items-center gap-1 text-xs text-primary-200 shrink-0">
-                      <Pencil className="size-3" />
-                      Edit
-                    </span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => goToStep(1)}
-                    className="w-full flex items-center justify-between gap-3 px-4 py-3 text-left"
-                  >
-                    <div className="min-w-0">
-                      <p className="text-xs text-light-400">Email</p>
-                      <p className="text-sm text-white font-medium truncate">{email}</p>
-                    </div>
-                    <span className="flex items-center gap-1 text-xs text-primary-200 shrink-0">
-                      <Pencil className="size-3" />
-                      Edit
-                    </span>
-                  </button>
-                </div>
-
-                <div className="flex items-start gap-2">
+                <div className="flex items-start gap-2 mt-2">
                   <input
                     type="checkbox"
                     id="terms"
                     checked={acceptedTerms}
                     onChange={(e) => {
                       setAcceptedTerms(e.target.checked);
-                      clearStepError(3);
+                      clearStepError(1);
                       clearFieldError("accepted_terms_and_policy");
                     }}
                     className="w-4 h-4 mt-0.5 bg-transparent border border-dark-300 dark:border-light-100/50 rounded accent-primary-200"
@@ -437,43 +364,228 @@ export default function SignUpPage() {
                     </Link>
                   </label>
                 </div>
-                {(stepErrors[3] || fieldErrors.accepted_terms_and_policy) && (
+                
+                {fieldErrors.accepted_terms_and_policy && (
                   <p className="text-red-500 text-xs">
-                    {stepErrors[3] ?? fieldErrors.accepted_terms_and_policy?.join(" ")}
+                    {fieldErrors.accepted_terms_and_policy.join(" ")}
                   </p>
                 )}
+                {stepErrors[1] && <p className="text-red-500 text-xs">{stepErrors[1]}</p>}
+              </div>
+
+              <button type="submit" className="auth-button w-full" disabled={busy}>
+                {loading ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <span className="size-5 border-2 border-dark-100 border-t-transparent rounded-full animate-spin" />
+                    Creating account...
+                  </span>
+                ) : (
+                  "Create Account"
+                )}
+              </button>
+            </div>
+          ) : (
+            // Mobile View: Wizard Form
+            <div className="flex flex-col gap-6">
+              <div 
+                className="relative overflow-hidden" 
+                style={{ height: stepHeight }}
+              >
+                <div 
+                  className="flex flex-row transition-transform duration-300" 
+                  style={{ transform: `translateX(-${step * 100}%)` }}
+                >
+                  {/* Step 1: Personal Details */}
+                  <div
+                    ref={(el) => {
+                      stepRefs.current[0] = el;
+                    }}
+                    className="w-full shrink-0 flex flex-col gap-4 pr-0.5"
+                    style={{ visibility: step === 0 ? "visible" : "hidden" }}
+                  >
+                    <GoogleSignInButton
+                      onCredential={handleGoogleCredential}
+                      loading={googleLoading}
+                      disabled={loading}
+                    />
+
+                    <div className="flex items-center gap-3">
+                      <div className="flex-1 h-px bg-white/10" />
+                      <span className="text-xs text-light-400">OR</span>
+                      <div className="flex-1 h-px bg-white/10" />
+                    </div>
+
+                    <div className="flex flex-col gap-1">
+                      <h4 className="text-base font-semibold text-white">{STEPS[0].title}</h4>
+                      <p className="text-sm text-light-400">{STEPS[0].subtitle}</p>
+                    </div>
+
+                    <div className="flex flex-col gap-3">
+                      <div className="form-div flex-1">
+                        <label htmlFor="firstNameMobile">First Name</label>
+                        <input
+                          id="firstNameMobile"
+                          type="text"
+                          placeholder="First name"
+                          value={firstName}
+                          onChange={(e) => {
+                            setFirstName(e.target.value);
+                            clearStepError(0);
+                            clearFieldError("first_name");
+                          }}
+                          autoComplete="given-name"
+                          required
+                        />
+                        {fieldErrors.first_name && (
+                          <p className="text-red-500 text-xs mt-1">{fieldErrors.first_name.join(" ")}</p>
+                        )}
+                      </div>
+                      <div className="form-div flex-1">
+                        <label htmlFor="lastNameMobile">Last Name</label>
+                        <input
+                          id="lastNameMobile"
+                          type="text"
+                          placeholder="Last name"
+                          value={lastName}
+                          onChange={(e) => {
+                            setLastName(e.target.value);
+                            clearStepError(0);
+                            clearFieldError("last_name");
+                          }}
+                          autoComplete="family-name"
+                          required
+                        />
+                        {fieldErrors.last_name && (
+                          <p className="text-red-500 text-xs mt-1">{fieldErrors.last_name.join(" ")}</p>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="form-div">
+                      <label htmlFor="emailMobile">Email Address</label>
+                      <input
+                        id="emailMobile"
+                        type="email"
+                        placeholder="you@example.com"
+                        value={email}
+                        onChange={(e) => {
+                          setEmail(e.target.value);
+                          clearStepError(0);
+                          clearFieldError("email");
+                        }}
+                        autoComplete="email"
+                        required
+                      />
+                      {fieldErrors.email && <p className="text-red-500 text-xs mt-1">{fieldErrors.email.join(" ")}</p>}
+                    </div>
+                    {stepErrors[0] && <p className="text-red-500 text-xs">{stepErrors[0]}</p>}
+                  </div>
+
+                  {/* Step 2: Secure Account */}
+                  <div
+                    ref={(el) => {
+                      stepRefs.current[1] = el;
+                    }}
+                    className="w-full shrink-0 flex flex-col gap-4 pr-0.5"
+                    style={{ visibility: step === 1 ? "visible" : "hidden" }}
+                  >
+                    <div className="flex flex-col gap-1">
+                      <h4 className="text-base font-semibold text-white">{STEPS[1].title}</h4>
+                      <p className="text-sm text-light-400">{STEPS[1].subtitle}</p>
+                    </div>
+                    
+                    <PasswordField
+                      id="passwordMobile"
+                      label="Password"
+                      placeholder="Create password"
+                      value={password}
+                      onChange={(v) => {
+                        setPassword(v);
+                        clearStepError(1);
+                        clearFieldError("password");
+                      }}
+                      error={fieldErrors.password?.join(" ")}
+                      autoComplete="new-password"
+                    />
+                    
+                    <PasswordField
+                      id="confirmPasswordMobile"
+                      label="Confirm Password"
+                      placeholder="Re-enter password"
+                      value={confirmPassword}
+                      onChange={(v) => {
+                        setConfirmPassword(v);
+                        clearStepError(1);
+                      }}
+                      error={fieldErrors.password_confirm?.join(" ") ?? fieldErrors.confirm_password?.join(" ")}
+                      autoComplete="new-password"
+                    />
+
+                    <div className="flex items-start gap-2 mt-2">
+                      <input
+                        type="checkbox"
+                        id="termsMobile"
+                        checked={acceptedTerms}
+                        onChange={(e) => {
+                          setAcceptedTerms(e.target.checked);
+                          clearStepError(1);
+                          clearFieldError("accepted_terms_and_policy");
+                        }}
+                        className="w-4 h-4 mt-0.5 bg-transparent border border-dark-300 dark:border-light-100/50 rounded accent-primary-200"
+                      />
+                      <label htmlFor="termsMobile" className="text-sm text-dark-300 dark:text-light-100 flex-1">
+                        I accept the{" "}
+                        <Link href="/terms" className="text-primary-200 hover:underline">
+                          Terms of Service
+                        </Link>{" "}
+                        and{" "}
+                        <Link href="/privacy" className="text-primary-200 hover:underline">
+                          Privacy Policy
+                        </Link>
+                      </label>
+                    </div>
+                    
+                    {fieldErrors.accepted_terms_and_policy && (
+                      <p className="text-red-500 text-xs">
+                        {fieldErrors.accepted_terms_and_policy.join(" ")}
+                      </p>
+                    )}
+                    {stepErrors[1] && <p className="text-red-500 text-xs">{stepErrors[1]}</p>}
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3">
+                {step > 0 && (
+                  <button
+                    type="button"
+                    onClick={goBack}
+                    disabled={busy}
+                    aria-label="Go back"
+                    className="btn-secondary !w-12 !min-h-12 !p-0 rounded-full flex items-center justify-center shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <ChevronLeft className="size-5" />
+                  </button>
+                )}
+                
+                <button type="submit" className="auth-button flex-1" disabled={busy}>
+                  {loading ? (
+                    <span className="flex items-center justify-center gap-2">
+                      <span className="size-5 border-2 border-dark-100 border-t-transparent rounded-full animate-spin" />
+                      Creating account...
+                    </span>
+                  ) : step === LAST_STEP ? (
+                    "Create Account"
+                  ) : (
+                    <span className="flex items-center justify-center gap-1.5">
+                      Continue
+                      <ChevronRight className="size-4" />
+                    </span>
+                  )}
+                </button>
               </div>
             </div>
-          </div>
-
-          <div className="flex items-center gap-3">
-            {step > 0 && (
-              <button
-                type="button"
-                onClick={goBack}
-                disabled={busy}
-                aria-label="Go back"
-                className="btn-secondary !w-12 !min-h-12 !p-0 rounded-full flex items-center justify-center shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <ChevronLeft className="size-5" />
-              </button>
-            )}
-            <button type="submit" className="auth-button flex-1" disabled={busy}>
-              {loading ? (
-                <span className="flex items-center justify-center gap-2">
-                  <span className="size-5 border-2 border-dark-100 border-t-transparent rounded-full animate-spin" />
-                  Creating account...
-                </span>
-              ) : step === LAST_STEP ? (
-                "Create Account"
-              ) : (
-                <span className="flex items-center justify-center gap-1.5">
-                  Continue
-                  <ChevronRight className="size-4" />
-                </span>
-              )}
-            </button>
-          </div>
+          )}
         </form>
 
         <p className="text-center text-sm">
