@@ -4,21 +4,50 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { authApi, ApiRequestError, type ValidationError } from "@/lib/api-client";
 
 export default function SignInPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<ValidationError>({});
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    // Placeholder: will connect to Django REST auth later
-    setTimeout(() => {
-      setLoading(false);
+    setError(null);
+    setFieldErrors({});
+
+    try {
+      const response = await authApi.login({ email, password });
+      
+      // Save tokens
+      localStorage.setItem("authToken", response.access);
+      localStorage.setItem("refreshToken", response.refresh);
+      
+      // Redirect to dashboard
       router.push("/dashboard");
-    }, 800);
+    } catch (err) {
+      setLoading(false);
+      if (err instanceof ApiRequestError) {
+        // If unverified, save email and redirect to verification page
+        if (err.message && err.message.toLowerCase().includes("not verified")) {
+          sessionStorage.setItem("verify_email", email);
+          router.push("/auth/verify-email");
+          return;
+        }
+
+        if (err.errors) {
+          setFieldErrors(err.errors);
+        } else {
+          setError(err.message);
+        }
+      } else {
+        setError("An unexpected error occurred. Please try again.");
+      }
+    }
   };
 
   return (
@@ -37,7 +66,13 @@ export default function SignInPage() {
 
         <h3 className="text-center">Welcome back</h3>
 
-        <form onSubmit={handleSignIn} className="w-full space-y-5 mt-4">
+        {error && (
+          <div className="p-3.5 bg-red-500/10 border border-red-500/20 text-red-500 text-sm rounded-xl text-center">
+            {error}
+          </div>
+        )}
+
+        <form onSubmit={handleSignIn} className="w-full space-y-5 mt-2">
           <div className="form-div">
             <label htmlFor="email">Email</label>
             <input
@@ -48,6 +83,9 @@ export default function SignInPage() {
               onChange={(e) => setEmail(e.target.value)}
               required
             />
+            {fieldErrors.email && (
+              <p className="text-red-500 text-xs mt-1">{fieldErrors.email.join(" ")}</p>
+            )}
           </div>
 
           <div className="form-div">
@@ -60,6 +98,9 @@ export default function SignInPage() {
               onChange={(e) => setPassword(e.target.value)}
               required
             />
+            {fieldErrors.password && (
+              <p className="text-red-500 text-xs mt-1">{fieldErrors.password.join(" ")}</p>
+            )}
           </div>
 
           <div className="text-right">
@@ -83,3 +124,4 @@ export default function SignInPage() {
     </div>
   );
 }
+
