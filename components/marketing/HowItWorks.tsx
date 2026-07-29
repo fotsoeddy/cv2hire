@@ -190,14 +190,14 @@ export function HowItWorks() {
 
   return (
     <section id="how-it-works" className="main-section py-20">
-      <div className="flex flex-col items-center">
+      <div className="flex flex-col items-center max-w-md mx-auto">
         <h2 className="text-center mb-4">How It Works</h2>
-        <p className="text-center text-light-400 mb-16 max-w-xl">
+        <p className="text-center text-light-400 mb-16">
           Five simple steps to transform your job search.
         </p>
       </div>
 
-      <div ref={sectionRef} className="relative w-full max-w-sm mx-auto">
+      <div ref={sectionRef} className="relative w-full max-w-md mx-auto">
         <svg ref={svgRef} aria-hidden className="absolute inset-0 w-full h-full overflow-visible">
           <defs>
             <linearGradient id="stepLineGradient" x1="0" y1="0" x2="0" y2="1">

@@ -6,6 +6,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { authApi, ApiRequestError, type ValidationError } from "@/lib/api-client";
 import { PasswordField } from "@/components/ui/PasswordField";
+import { GoogleSignInButton } from "@/components/auth/GoogleSignInButton";
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -16,6 +17,7 @@ export default function SignUpPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<ValidationError>({});
 
@@ -60,6 +62,21 @@ export default function SignUpPage() {
       } else {
         setError("An unexpected error occurred. Please try again.");
       }
+    }
+  };
+
+  const handleGoogleCredential = async (idToken: string) => {
+    setGoogleLoading(true);
+    setError(null);
+
+    try {
+      const response = await authApi.googleLogin(idToken);
+      localStorage.setItem("authToken", response.access);
+      localStorage.setItem("refreshToken", response.refresh);
+      router.push("/dashboard");
+    } catch (err) {
+      setGoogleLoading(false);
+      setError(err instanceof ApiRequestError ? err.message : "Google sign-up failed. Please try again.");
     }
   };
 
@@ -181,10 +198,24 @@ export default function SignUpPage() {
             <p className="text-red-500 text-xs mt-1">{fieldErrors.accepted_terms_and_policy.join(" ")}</p>
           )}
 
-          <button type="submit" className="auth-button mt-2" disabled={loading}>
+          <button type="submit" className="auth-button mt-2" disabled={loading || googleLoading}>
             {loading ? "Signing Up..." : "Sign Up"}
           </button>
         </form>
+
+        <div className="flex items-center gap-3">
+          <div className="flex-1 h-px bg-white/10" />
+          <span className="text-xs text-light-400">OR</span>
+          <div className="flex-1 h-px bg-white/10" />
+        </div>
+
+        {acceptedTerms ? (
+          <GoogleSignInButton onCredential={handleGoogleCredential} />
+        ) : (
+          <p className="text-center text-xs text-light-400">
+            Check the box above to continue with Google.
+          </p>
+        )}
 
         <p className="text-center text-sm mt-2">
           Already have an account?{" "}

@@ -126,4 +126,15 @@ export const authApi = {
       method: "POST",
       body: JSON.stringify(data),
     }),
+
+  googleLogin: (idToken: string) =>
+    request<{
+      message: string;
+      user: { id: number; email: string };
+      access: string;
+      refresh: string;
+    }>("/api/google-login/", {
+      method: "POST",
+      body: JSON.stringify({ id_token: idToken }),
+    }),
 };

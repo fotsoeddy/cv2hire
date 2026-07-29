@@ -6,12 +6,14 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { authApi, ApiRequestError, type ValidationError } from "@/lib/api-client";
 import { PasswordField } from "@/components/ui/PasswordField";
+import { GoogleSignInButton } from "@/components/auth/GoogleSignInButton";
 
 export default function SignInPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<ValidationError>({});
 
@@ -48,6 +50,21 @@ export default function SignInPage() {
       } else {
         setError("An unexpected error occurred. Please try again.");
       }
+    }
+  };
+
+  const handleGoogleCredential = async (idToken: string) => {
+    setGoogleLoading(true);
+    setError(null);
+
+    try {
+      const response = await authApi.googleLogin(idToken);
+      localStorage.setItem("authToken", response.access);
+      localStorage.setItem("refreshToken", response.refresh);
+      router.push("/dashboard");
+    } catch (err) {
+      setGoogleLoading(false);
+      setError(err instanceof ApiRequestError ? err.message : "Google sign-in failed. Please try again.");
     }
   };
 
@@ -107,10 +124,18 @@ export default function SignInPage() {
             </Link>
           </div>
 
-          <button type="submit" className="auth-button" disabled={loading}>
+          <button type="submit" className="auth-button" disabled={loading || googleLoading}>
             {loading ? "Signing in..." : "Sign In"}
           </button>
         </form>
+
+        <div className="flex items-center gap-3">
+          <div className="flex-1 h-px bg-white/10" />
+          <span className="text-xs text-light-400">OR</span>
+          <div className="flex-1 h-px bg-white/10" />
+        </div>
+
+        <GoogleSignInButton onCredential={handleGoogleCredential} />
 
         <p className="text-center text-sm">
           Don&apos;t have an account?{" "}
