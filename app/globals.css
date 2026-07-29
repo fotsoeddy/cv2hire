@@ -202,6 +202,16 @@
     font-size: 0.875rem;
     padding: 0.5rem 1rem;
   }
+
+  /* Inline nav actions stay compact — the full-width rule above is meant
+     for stacked CTA/auth buttons, not the navbar's side-by-side pair. */
+  .navbar .btn-primary,
+  .navbar .btn-ghost {
+    width: auto;
+    min-height: 2.25rem;
+    padding: 0.5rem 0.875rem;
+    font-size: 0.75rem;
+  }
 }
 
 .btn-primary {
