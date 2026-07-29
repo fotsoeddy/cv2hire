@@ -28,6 +28,7 @@ export function useAuthGuard() {
       router.replace("/auth/sign-in");
       return;
     }
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- see docstring above: this must run post-mount, client-only
     setChecked(true);
   }, [router]);
 

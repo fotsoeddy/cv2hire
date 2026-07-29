@@ -45,6 +45,11 @@ export function useApiResource<T>(fetcher: () => Promise<T>, enabled = true) {
     };
   }, [enabled, fetcher]);
 
+  // Fetch-on-mount/dep-change is the standard "synchronize with an
+  // external system" effect React's own docs describe — there's no way
+  // to kick off the request without eventually calling setState from
+  // inside the effect.
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => load(), [load]);
 
   return { ...state, refetch: load };
