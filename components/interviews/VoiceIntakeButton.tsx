@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { useVapiCall } from "@/hooks/useVapiCall";
 import { useSessionUser } from "@/hooks/useSessionUser";
+import { interviewsApi } from "@/lib/api/interviews";
 import { cn } from "@/lib/utils";
 
 const INTAKE_ASSISTANT_ID = process.env.NEXT_PUBLIC_VAPI_INTAKE_ASSISTANT_ID;
@@ -24,10 +25,24 @@ export function VoiceIntakeButton() {
   const hasNavigatedRef = useRef(false);
 
   useEffect(() => {
-    if (status === "ended" && !hasNavigatedRef.current) {
-      hasNavigatedRef.current = true;
-      router.push("/dashboard/interviews");
-    }
+    if (status !== "ended" || hasNavigatedRef.current) return;
+    hasNavigatedRef.current = true;
+
+    // Intake creates the session itself (via its own tool calls) and hands
+    // the call off to the Interviewer server-side, so we never learn the
+    // sessionId client-side — look it up as "the session that was just
+    // created for this user" instead, since the list is already newest-first.
+    interviewsApi
+      .listSessions()
+      .then((sessions) => {
+        const latest = sessions[0];
+        router.push(
+          latest ? `/dashboard/interviews/feedback/${latest.id}` : "/dashboard/interviews"
+        );
+      })
+      .catch(() => {
+        router.push("/dashboard/interviews");
+      });
   }, [status, router]);
 
   if (!INTAKE_ASSISTANT_ID) {
