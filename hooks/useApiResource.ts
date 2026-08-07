@@ -25,25 +25,34 @@ export function useApiResource<T>(fetcher: () => Promise<T>, enabled = true) {
     error: null,
   });
 
-  const load = useCallback(() => {
-    if (!enabled) return;
-    let cancelled = false;
-    setState((prev) => ({ ...prev, loading: true, error: null }));
+  const load = useCallback(
+    (opts?: { silent?: boolean }) => {
+      if (!enabled) return;
+      let cancelled = false;
+      const silent = opts?.silent ?? false;
+      if (!silent) {
+        setState((prev) => ({ ...prev, loading: true, error: null }));
+      }
 
-    fetcher()
-      .then((data) => {
-        if (!cancelled) setState({ data, loading: false, error: null });
-      })
-      .catch((err: unknown) => {
-        if (cancelled) return;
-        const message = err instanceof ApiRequestError ? err.message : "Something went wrong.";
-        setState({ data: null, loading: false, error: message });
-      });
+      fetcher()
+        .then((data) => {
+          if (!cancelled) setState({ data, loading: false, error: null });
+        })
+        .catch((err: unknown) => {
+          if (cancelled) return;
+          // A silent (poll-driven) failure keeps showing the last good data
+          // instead of blanking the page — the next tick just tries again.
+          if (silent) return;
+          const message = err instanceof ApiRequestError ? err.message : "Something went wrong.";
+          setState({ data: null, loading: false, error: message });
+        });
 
-    return () => {
-      cancelled = true;
-    };
-  }, [enabled, fetcher]);
+      return () => {
+        cancelled = true;
+      };
+    },
+    [enabled, fetcher]
+  );
 
   // Fetch-on-mount/dep-change is the standard "synchronize with an
   // external system" effect React's own docs describe — there's no way

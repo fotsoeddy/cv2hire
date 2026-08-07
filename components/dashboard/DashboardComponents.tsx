@@ -79,7 +79,7 @@ export function RecentSessionCard({
   const scoreColor = getScoreColor(session.overall_score);
   const href =
     session.status === "completed"
-      ? `/dashboard/interviews/feedback/${session.id}`
+      ? `/interview-results/${session.id}`
       : `/dashboard/interviews/session/${session.id}`;
 
   return (

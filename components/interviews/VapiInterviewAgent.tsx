@@ -1,9 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import { Mic } from "lucide-react";
-import { useEffect, useRef } from "react";
+import { Mic, Sparkles } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { useVapiCall } from "@/hooks/useVapiCall";
+import { useInterviewSession, isSessionGraded } from "@/hooks/useInterviewSession";
 import type { InterviewQuestion } from "@/types/interviews";
 import { cn } from "@/lib/utils";
 
@@ -15,6 +16,12 @@ interface VapiInterviewAgentProps {
 }
 
 const ASSISTANT_ID = process.env.NEXT_PUBLIC_VAPI_INTERVIEWER_ASSISTANT_ID;
+const SESSION_STORAGE_KEY = "cv2hire:activeInterviewSessionId";
+
+// How long to let the assistant finish its spoken closing line before we
+// force the call closed and navigate away — grading already succeeded by
+// the time this fires, this is purely about not cutting off the audio.
+const RESULTS_READY_DELAY_MS = 1500;
 
 export default function VapiInterviewAgent({
   sessionId,
@@ -24,15 +31,44 @@ export default function VapiInterviewAgent({
 }: VapiInterviewAgentProps) {
   const { status, isSpeaking, localVolume, transcript, error, start, stop, retry } =
     useVapiCall();
-  const hasEndedRef = useRef(false);
+  // Grading is driven by Vapi's grade_interview tool call, independently of
+  // whether/when the call itself ends — poll for it directly rather than
+  // relying solely on the call-end event, which the assistant may never fire
+  // (e.g. it never invokes its End Call tool) or which may fire before
+  // Django has actually finished saving the grade.
+  const { data: session } = useInterviewSession(sessionId, true, 1500);
+  const graded = isSessionGraded(session);
+
+  const [resultsReady, setResultsReady] = useState(false);
+  const hasFinishedRef = useRef(false);
   const transcriptEndRef = useRef<HTMLDivElement>(null);
 
+  // Call-end path: the assistant (or the user) ended the call. Navigate
+  // immediately — the results page keeps polling on its own if grading
+  // hasn't landed yet.
   useEffect(() => {
-    if (status === "ended" && !hasEndedRef.current) {
-      hasEndedRef.current = true;
+    if (status === "ended" && !hasFinishedRef.current) {
+      hasFinishedRef.current = true;
       onEnd();
     }
   }, [status, onEnd]);
+
+  // Grading-complete path: Django saved a grade while the call is still
+  // open. Show a brief "results are ready" state, give the assistant a
+  // moment to say its closing line, then stop the call ourselves as a
+  // failsafe and navigate.
+  useEffect(() => {
+    if (!graded || hasFinishedRef.current) return;
+    hasFinishedRef.current = true;
+    setResultsReady(true);
+
+    const timer = setTimeout(() => {
+      if (status === "active" || status === "connecting") stop();
+      onEnd();
+    }, RESULTS_READY_DELAY_MS);
+
+    return () => clearTimeout(timer);
+  }, [graded, status, stop, onEnd]);
 
   useEffect(() => {
     transcriptEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
@@ -53,6 +89,12 @@ export default function VapiInterviewAgent({
   }
 
   const handleStart = () => {
+    try {
+      sessionStorage.setItem(SESSION_STORAGE_KEY, sessionId);
+    } catch {
+      // Private browsing / storage disabled — sessionId still lives in the
+      // route and in this component's props, so nothing depends on this.
+    }
     start({
       assistantId: ASSISTANT_ID,
       variableValues: {
@@ -174,9 +216,16 @@ export default function VapiInterviewAgent({
         </div>
       </div>
 
+      {resultsReady && (
+        <div className="p-3.5 bg-success-100/10 border border-success-100/20 text-success-100 text-sm rounded-xl text-center flex items-center justify-center gap-2">
+          <Sparkles className="size-4" />
+          Results are ready — wrapping up the call…
+        </div>
+      )}
+
       <div className="w-full flex justify-center gap-4">
         {status === "active" ? (
-          <button className="btn-disconnect" onClick={stop}>
+          <button className="btn-disconnect" onClick={stop} disabled={resultsReady}>
             End Interview
           </button>
         ) : status === "error" ? (

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
+import { useCallback } from "react";
 import { ArrowLeft } from "lucide-react";
 import { useInterviewSession } from "@/hooks/useInterviewSession";
 import { useJob } from "@/hooks/useJob";
@@ -24,6 +25,15 @@ export default function InterviewSessionPage() {
   } = useJobQuestions(session?.job);
 
   const loading = sessionLoading || jobLoading || questionsLoading;
+
+  // Declared before the loading/error early returns below (Rules of Hooks —
+  // VapiInterviewAgent only renders once session is loaded, so by the time
+  // this actually gets called `session` is guaranteed to be set).
+  const sessionIdForEnd = session?.id;
+  const handleEnd = useCallback(() => {
+    if (!sessionIdForEnd) return;
+    router.replace(`/interview-results/${sessionIdForEnd}`);
+  }, [router, sessionIdForEnd]);
 
   if (loading) {
     return (
@@ -50,10 +60,6 @@ export default function InterviewSessionPage() {
   }
 
   const coverImage = getStableCover(job.id);
-
-  const handleEnd = () => {
-    router.push(`/dashboard/interviews/feedback/${session.id}`);
-  };
 
   return (
     <div className="space-y-8 max-w-5xl mx-auto">

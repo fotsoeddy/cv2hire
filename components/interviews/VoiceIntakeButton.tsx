@@ -36,12 +36,10 @@ export function VoiceIntakeButton() {
       .listSessions()
       .then((sessions) => {
         const latest = sessions[0];
-        router.push(
-          latest ? `/dashboard/interviews/feedback/${latest.id}` : "/dashboard/interviews"
-        );
+        router.replace(latest ? `/interview-results/${latest.id}` : "/dashboard/interviews");
       })
       .catch(() => {
-        router.push("/dashboard/interviews");
+        router.replace("/dashboard/interviews");
       });
   }, [status, router]);
 
